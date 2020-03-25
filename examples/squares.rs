@@ -51,16 +51,6 @@ fn model(app: &App) -> Model {
     }
 }
 
-fn next_dir(d: Point2) -> Point2 {
-    match d {
-        Point2 { x: 0., y: 1. } => pt2(1., 0.),
-        Point2 { x: 0., y: -1. } => pt2(-1., 0.),
-        Point2 { x: 1., y: 0. } => pt2(0., -1.),
-        Point2 { x: -1., y: 0. } => pt2(0., 1.),
-        _ => pt2(0., 0.),
-    }
-}
-
 fn borders(width: f32, height: f32, p: Point2) -> Point2 {
     let l = -width / 2.;
     let r = width / 2.;
@@ -81,8 +71,6 @@ fn borders(width: f32, height: f32, p: Point2) -> Point2 {
 
 fn update(app: &App, m: &mut Model, _update: Update) {
     // if app.elapsed_frames() >= 92 { return };
-    let n_frames = (app.elapsed_frames() % 180) as f32;
-    let shift = 56.57 / 180.;
     let mut position = m.position.clone();
     let mut rotation = m.rotation.clone();
     let t = app.elapsed_frames() % 180;
@@ -102,22 +90,9 @@ fn update(app: &App, m: &mut Model, _update: Update) {
         }
     }
     for (i, row) in m.position.iter().enumerate() {
-        for (j, p) in row.iter().enumerate() {
+        for (j, _p) in row.iter().enumerate() {
             let t = clock(app.elapsed_frames());
             rotation[i][j] = PI / 2. * t;
-            // if i % 2 == 0 && t < 0.5 {
-            //     rotation[i][j] = -PI / 2. * t;
-            //     position[i][j] = *p + pt2(0., shift);
-            // } else if i % 2 == 1 && t < 0.5 {
-            //     rotation[i][j] = PI / 2. * t;
-            //     position[i][j] = *p + pt2(0., -shift);
-            // } else if j % 2 == 0 && t >= 0.5 {
-            //     rotation[i][j] = PI / 2. * t;
-            //     position[i][j] = *p + pt2(shift, 0.);
-            // } else {
-            //     rotation[i][j] = -PI / 2. * t;
-            //     position[i][j] = *p + pt2(-shift, 0.);
-            // }
             position[i][j] = borders(SZ as f32, SZ as f32, position[i][j]);
         }
     }
