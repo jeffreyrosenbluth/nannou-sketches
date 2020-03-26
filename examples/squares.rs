@@ -1,3 +1,6 @@
+// Inspired by Bees and Bombs:
+// https://beesandbombs.tumblr.com/post/178493871934/squares-turning#notes
+
 use nannou::ease::cubic::ease_in_out;
 use nannou::prelude::*;
 
@@ -5,7 +8,7 @@ fn main() {
     nannou::app(model).update(update).run()
 }
 
-const SZ: u32 = 527;
+const SZ: u32 = 520;
 
 #[derive(Debug)]
 struct Model {
@@ -51,36 +54,17 @@ fn model(app: &App) -> Model {
     }
 }
 
-fn borders(width: f32, height: f32, p: Point2) -> Point2 {
-    let l = -width / 2.;
-    let r = width / 2.;
-    let t = height / 2.;
-    let b = -height / 2.;
-    let mut u = p.x;
-    let mut v = p.y;
-    let gap = 16.57;
-    match p {
-        Vector2 { x, .. } if x < l - gap => u = r + gap,
-        Vector2 { y, .. } if y < b - gap => v = t + gap,
-        Vector2 { x, .. } if x > r + gap => u = l - gap,
-        Vector2 { y, .. } if y > t + gap => v = b - gap,
-        _ => (),
-    };
-    pt2(u, v)
-}
-
 fn update(app: &App, m: &mut Model, _update: Update) {
-    // if app.elapsed_frames() >= 92 { return };
     let mut position = m.position.clone();
     let mut rotation = m.rotation.clone();
     let t = app.elapsed_frames() % 180;
     if t == 90 {
-    for (i, row) in m.position.iter().enumerate() {
-        for (j, p) in row.iter().enumerate() {
-            let phase = if m.sq_color == BLACK {-1.} else {1.};
-            position[i][j] = pt2(p.x + phase * 56.57 / 2., p.y + phase * 56.57 / 2.);
+        for (i, row) in m.position.iter().enumerate() {
+            for (j, p) in row.iter().enumerate() {
+                let phase = if m.sq_color == BLACK { -1. } else { 1. };
+                position[i][j] = pt2(p.x + phase * 56.57 / 2., p.y + phase * 56.57 / 2.);
+            }
         }
-    }
         if m.sq_color == WHITE {
             m.sq_color = BLACK;
             m.bg_color = WHITE;
@@ -89,11 +73,10 @@ fn update(app: &App, m: &mut Model, _update: Update) {
             m.bg_color = BLACK;
         }
     }
-    for (i, row) in m.position.iter().enumerate() {
-        for (j, _p) in row.iter().enumerate() {
+    for (i, col) in m.position.iter().enumerate() {
+        for (j, _p) in col.iter().enumerate() {
             let t = clock(app.elapsed_frames());
             rotation[i][j] = PI / 2. * t;
-            position[i][j] = borders(SZ as f32, SZ as f32, position[i][j]);
         }
     }
     m.position = position;
@@ -109,6 +92,10 @@ fn view(app: &App, m: &Model, frame: Frame) {
         }
     }
     draw.to_frame(app, &frame).unwrap();
+    if app.elapsed_frames() < 360 {
+        let file_path = captured_frame_path(app, &frame);
+        app.main_window().capture_frame(file_path);
+    }
 }
 
 fn square(draw: &app::Draw, position: Point2, rot: f32, col: Rgb<u8>) {
@@ -117,4 +104,16 @@ fn square(draw: &app::Draw, position: Point2, rot: f32, col: Rgb<u8>) {
         .xy(position)
         .rotate(rot)
         .color(col);
+}
+
+fn captured_frame_path(app: &App, frame: &Frame) -> std::path::PathBuf {
+    // Create a path that we want to save this frame to.
+    app.project_path()
+        .expect("failed to locate `project_path`")
+        // Capture all frames to a directory called `/<path_to_nannou>/nannou/simple_capture`.
+        .join(app.exe_name().unwrap())
+        // Name each file after the number of the frame.
+        .join(format!("image_{:03}", frame.nth()))
+        // The extension will be PNG. We also support tiff, bmp, gif, jpeg, webp and some others.
+        .with_extension("png")
 }
