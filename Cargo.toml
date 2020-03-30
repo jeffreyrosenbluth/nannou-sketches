@@ -31,3 +31,6 @@ path = "examples/squares.rs"
 [[example]]
 name = "pendulum"
 path = "examples/pendulum.rs"
+[[example]]
+name = "rings"
+path = "examples/rings.rs"

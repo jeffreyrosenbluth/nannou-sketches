@@ -109,3 +109,7 @@ fn key_pressed(_app: &App, model: &mut Model, key: Key) {
 fn view(_app: &App, _model: &Model, frame: Frame) {
     frame.clear(DIMGRAY);
 }
+
+fn update<'a>(app: &App, m: &mut Model, _update: Update) {
+    m.stream.send(|)
+}
