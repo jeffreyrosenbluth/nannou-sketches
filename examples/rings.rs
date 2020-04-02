@@ -27,8 +27,11 @@ fn view(app: &App, _m: &Model, frame: Frame) {
         for i in 0..150 {
             let mut x = (i as f32 / 100. * TAU).cos();
             let mut y = (i as f32 / 100. * TAU).sin();
-            let z = app.elapsed_frames() as f64 * 0.003;
-            let offset = nn.get([x as f64, y as f64 + j as f64 * 0.03, z]) as f32;
+            let a = app.elapsed_frames() % 360;
+            let a = (a as f64) * PI_F64 / 180.;
+            let u = 0.3 * a.cos();
+            let v = 0.3 * a.sin();
+            let offset = nn.get([x as f64, y as f64 + j as f64 * 0.03, u, v]) as f32;
             x *= rad + 2. * offset * rad;
             y *= rad + 2. * offset * rad;
             ps.push(pt2(x, y));

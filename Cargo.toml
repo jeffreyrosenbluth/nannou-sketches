@@ -1,5 +1,5 @@
 [package]
-name = "nannou-sketches"
+name = "sketches"
 version = "0.1.0"
 authors = ["Jeffrey Rosenbluth <jeffrey.rosenbluth@gmail.com>"]
 edition = "2018"
