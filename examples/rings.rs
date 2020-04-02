@@ -34,7 +34,7 @@ fn view(app: &App, _m: &Model, frame: Frame) {
             ps.push(pt2(x, y));
         }
         let alpha = j as f32 / rings as f32;
-        draw.polyline().points(ps).color(with_opacity(ORANGE, alpha)).x_y(0., 0.);
+        draw.path().stroke().points(ps).color(with_opacity(ORANGE, alpha)).x_y(0., 0.);
     }
     draw.to_frame(app, &frame).unwrap();
 }

@@ -2,7 +2,7 @@ use nannou::prelude::*;
 
 fn clock(frame: u64) -> f32 {
     let rate = 360;
-    (frame % rate) as f32 / rate as f32;
+    (frame % rate) as f32 / rate as f32
 }
 
 fn main() {
