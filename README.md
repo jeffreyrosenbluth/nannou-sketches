@@ -16,3 +16,7 @@ Uses OpenSimplex noise and creates a noise loop.
 # Dolphin
 
 ![Dolphin](https://github.com/jeffreyrosenbluth/nannou-sketches/raw/master/gif/dolphin.gif)
+
+# Pendulum
+
+![Pendulum](https://github.com/jeffreyrosenbluth/nannou-sketches/raw/master/gif/pendulum.gif)
