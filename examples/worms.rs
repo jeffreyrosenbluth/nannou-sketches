@@ -107,4 +107,21 @@ fn view(app: &App, m: &Model, frame: Frame) {
         draw.ellipse().xy(m.c[i].position).color(WHITE).w_h(r, r);
     }
     draw.to_frame(app, &frame).unwrap();
+    if app.elapsed_frames() < 1440 && app.elapsed_frames() % 4 ==0 {
+        let file_path = captured_frame_path(app, &frame);
+        app.main_window().capture_frame(file_path);
+    }
+}
+
+
+pub fn captured_frame_path(app: &App, frame: &Frame) -> std::path::PathBuf {
+    // Create a path that we want to save this frame to.
+    app.project_path()
+        .expect("failed to locate `project_path`")
+        // Capture all frames to a directory called `/<path_to_nannou>/nannou/simple_capture`.
+        .join(app.exe_name().unwrap())
+        // Name each file after the number of the frame.
+        .join(format!("image_{:03}", frame.nth() / 4))
+        // The extension will be PNG. We also support tiff, bmp, gif, jpeg, webp and some others.
+        .with_extension("png")
 }
