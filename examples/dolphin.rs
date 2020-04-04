@@ -1,6 +1,7 @@
 use nannou::color::IntoLinSrgba;
 use nannou::math::{Basis2, Rad};
 use nannou::prelude::*;
+use sketches::captured_frame_path;
 
 fn main() {
     nannou::app(model).update(update).run()
@@ -22,7 +23,7 @@ fn model(app: &App) -> Model {
 
 fn update(_app: &App, m: &mut Model, _update: Update) {
     m.bg_angle += 1. / 720.;
-    m.sm_angle += 1. / 401.;
+    m.sm_angle += 1. / 360.;
 }
 
 fn view(app: &App, m: &Model, frame: Frame) {
@@ -32,6 +33,11 @@ fn view(app: &App, m: &Model, frame: Frame) {
     grid(&draw);
     circles(&draw, m.bg_angle, with_opacity(PURPLE, 0.98), 80.);
     draw.to_frame(app, &frame).unwrap();
+
+    if app.elapsed_frames() < 120 {
+        let file_path = captured_frame_path(app, &frame);
+        app.main_window().capture_frame(file_path);
+    }
 }
 
 fn rotate_pt(p: Point2<f32>, turn: f32) -> Point2<f32> {
