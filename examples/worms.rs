@@ -1,5 +1,5 @@
-use nannou::prelude::*;
 use nannou::noise::NoiseFn;
+use nannou::prelude::*;
 
 fn main() {
     nannou::app(model).update(update).run()
@@ -30,14 +30,17 @@ impl Particle {
 
     fn go(&mut self, speed: f32) {
         let angle = noise(self.position, 100.);
-		self.direction.x = angle.cos();
-		self.direction.y = angle.sin();
+        self.direction.x = angle.cos();
+        self.direction.y = angle.sin();
         self.velocity = self.direction.with_magnitude(speed);
         self.position += self.velocity;
     }
-    
     fn edges(&mut self, rect: &Rect) {
-        if self.position.x > rect.right() || self.position.x < rect.left() || self.position.y > rect.top() || self.position.y < rect.bottom() {
+        if self.position.x > rect.right()
+            || self.position.x < rect.left()
+            || self.position.y > rect.top()
+            || self.position.y < rect.bottom()
+        {
             self.position.x = random_range(rect.left(), rect.right());
             self.position.y = random_range(rect.bottom(), rect.top());
         }
@@ -96,18 +99,12 @@ fn view(app: &App, m: &Model, frame: Frame) {
     }
     for i in 0..m.n {
         let r = map_range(i as f32, 0., m.n as f32, 1.0, 2.0);
-        draw.ellipse()
-            .xy(m.a[i].position)
-            .color(BLUE)
-            .w_h(r, r);
+        draw.ellipse().xy(m.a[i].position).color(BLUE).w_h(r, r);
         draw.ellipse()
             .xy(m.b[i].position)
             .color(CORNFLOWERBLUE)
             .w_h(r, r);
-        draw.ellipse()
-            .xy(m.c[i].position)
-            .color(WHITE)
-            .w_h(r, r);
+        draw.ellipse().xy(m.c[i].position).color(WHITE).w_h(r, r);
     }
     draw.to_frame(app, &frame).unwrap();
 }
