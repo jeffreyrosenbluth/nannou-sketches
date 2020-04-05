@@ -2,7 +2,7 @@ use nannou::prelude::*;
 use nannou::ease::cubic::ease_in_out;
 use nannou::math::{Basis2, Rad};
 use nannou::color::white_point::D65;
-use nannou::color::{Alpha, Lab, Laba};
+use nannou::color::{Alpha, Lab, Laba, IntoLinSrgba};
 
 pub fn captured_frame_path(app: &App, frame: &Frame) -> std::path::PathBuf {
     // Create a path that we want to save this frame to.
@@ -42,4 +42,28 @@ pub fn rotate_pt(p: Point2<f32>, turn: f32) -> Point2<f32> {
     let rot: Basis2<f32> = Rotation2::from_angle(rad);
     let q = rot.rotate_point(p.into());
     pt2(q.x, q.y)
+}
+
+pub fn circle_mask<T>(draw: &app::Draw, width: f32, height: f32, radius: f32, color: T)
+where T: IntoLinSrgba<f32>
+ {
+    use nannou::geom::path::Builder;
+    let mut builder = Builder::new();
+    let w2 = width / 2.;
+    let h2 = height / 2.;
+    builder = builder.move_to(pt2(-w2, h2));
+    builder = builder.line_to(pt2(w2, h2));
+    builder = builder.line_to(pt2(w2, -h2));
+    builder = builder.line_to(pt2(-w2, -h2));
+    builder = builder.move_to(pt2(0., -radius));
+    builder = builder.arc(pt2(0.,0.), vec2(radius, radius), TAU, 0.);
+    builder = builder.close();
+    
+    let p = builder.build();
+
+    // draw arc
+    draw.path()
+        .fill()
+        .color(color)
+        .events(p.iter());
 }

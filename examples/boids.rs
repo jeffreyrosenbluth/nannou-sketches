@@ -165,6 +165,6 @@ fn display(boid: &Boid, draw: &Draw) {
     draw.polygon()
         .points(points)
         .xy(*position)
-        .color(ORANGE)
+        .color(PLUM)
         .rotate(theta);
 }

@@ -3,6 +3,14 @@ A collection of sketches made using the nannou creative coding package in Rust.
 
 ***
 
+# Worms
+
+![Worms](https://github.com/jeffreyrosenbluth/nannou-sketches/raw/master/gif/worms.gif)
+
+[[source code]](https://github.com/jeffreyrosenbluth/nannou-sketches/blob/master/examples/worms.rs)
+
+***
+
 # Squares
 
 ![Squares](https://github.com/jeffreyrosenbluth/nannou-sketches/raw/master/gif/square.gif)
@@ -38,13 +46,5 @@ Uses OpenSimplex noise and creates a noise loop.
 ![Pendulum](https://github.com/jeffreyrosenbluth/nannou-sketches/raw/master/gif/pendulum.gif)
 
 [[source code]](https://github.com/jeffreyrosenbluth/nannou-sketches/blob/master/examples/pendulum.rs)
-
-***
-
-# Worms
-
-![Worms](https://github.com/jeffreyrosenbluth/nannou-sketches/raw/master/gif/worms.gif)
-
-[[source code]](https://github.com/jeffreyrosenbluth/nannou-sketches/blob/master/examples/worms.rs)
 
 ***
