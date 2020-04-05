@@ -28,6 +28,7 @@ pub fn random_color() -> Alpha<Lab<D65, f32>, f32> {
     let o: f32 = random_range(0.5, 1.0);
     Laba::new(l, a, b, o)
 }
+
 pub fn with_opacity(c: nannou::color::Srgb<u8>, o: f32) -> nannou::color::rgb::Srgba {
     srgba(
         c.red as f32 / 255.,
