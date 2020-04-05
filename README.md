@@ -5,7 +5,7 @@ A collection of sketches made using the nannou creative coding package in Rust.
 
 # Worms
 
-![Worms](https://github.com/jeffreyrosenbluth/nannou-sketches/raw/master/gif/worms22.gif)
+![Worms](https://github.com/jeffreyrosenbluth/nannou-sketches/raw/master/gif/worms2.gif)
 
 [[source code]](https://github.com/jeffreyrosenbluth/nannou-sketches/blob/master/examples/worms.rs)
 
