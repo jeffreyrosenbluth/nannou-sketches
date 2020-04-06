@@ -34,3 +34,6 @@ path = "examples/pendulum.rs"
 [[example]]
 name = "rings"
 path = "examples/rings.rs"
+[[example]]
+name = "reveal"
+path = "examples/reveal.rs"

@@ -48,3 +48,11 @@ Uses OpenSimplex noise and creates a noise loop.
 [[source code]](https://github.com/jeffreyrosenbluth/nannou-sketches/blob/master/examples/pendulum.rs)
 
 ***
+
+# Reveal
+
+![Reveal](https://github.com/jeffreyrosenbluth/nannou-sketches/raw/master/gif/reveal.gif)
+
+[[source code]](https://github.com/jeffreyrosenbluth/nannou-sketches/blob/master/examples/reveal.rs)
+
+***
