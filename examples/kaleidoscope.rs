@@ -62,7 +62,7 @@ impl Ball {
         self.position += self.velocity;
     }
 
-    fn display(&self, draw: &app::Draw) {
+    fn display(&self, draw: &Draw) {
         draw.ellipse()
             .xy(self.position)
             .color(self.color)

@@ -48,18 +48,18 @@ fn view(app: &App, m: &Model, frame: Frame) {
         .x_y(0., 300.);
     draw.to_frame(app, &frame).unwrap();
 
-    if app.elapsed_frames() < 360 {
-        let file_path = captured_frame_path(app, &frame);
-        app.main_window().capture_frame(file_path);
-    }
+    // if app.elapsed_frames() < 360 {
+    //     let file_path = captured_frame_path(app, &frame);
+    //     app.main_window().capture_frame(file_path);
+    // }
 }
 
-fn stripe(draw: &app::Draw, x: f32, w: f32, h: f32) {
+fn stripe(draw: &Draw, x: f32, w: f32, h: f32) {
     draw.rect().color(DIMGRAY).w_h(w, h).x_y(x + 3., 0.);
     draw.rect().color(WHITE).w_h(w, h).x_y(x, 0.);
 }
 
-fn bob(draw: &app::Draw, x: f32, y: f32, size: f32) {
+fn bob(draw: &Draw, x: f32, y: f32, size: f32) {
     draw.line()
         .points(pt2(0., 300.), pt2(x, y))
         .color(DARKGOLDENROD)

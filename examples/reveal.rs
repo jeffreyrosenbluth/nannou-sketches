@@ -14,9 +14,6 @@ struct Model {
 
 fn model(app: &App) -> Model {
     app.new_window().size(800, 800).view(view).build().unwrap();
-    let assets = app.assets_path().unwrap();
-    let img_path = assets .join("plumbpaper.png");
-    // let texture = wgpu::Texture::from_path(app, img_path).unwrap();
     Model { rects: Vec::new(), alpha: 1.0 }
 }
 
@@ -87,8 +84,8 @@ fn view(app: &App, model: &Model, frame: Frame) {
     // Write the result of our drawing to the window's frame.
     draw.to_frame(app, &frame).unwrap();
 
-    if app.elapsed_frames() < 360 {
-        let file_path = captured_frame_path(app, &frame);
-        app.main_window().capture_frame(file_path);
-    }
+    // if app.elapsed_frames() < 360 {
+    //     let file_path = captured_frame_path(app, &frame);
+    //     app.main_window().capture_frame(file_path);
+    // }
 }

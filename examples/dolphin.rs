@@ -47,7 +47,7 @@ fn rotate_pt(p: Point2<f32>, turn: f32) -> Point2<f32> {
     pt2(q.x, q.y)
 }
 
-fn circles<C>(draw: &app::Draw, angle: f32, c: C, s: f32)
+fn circles<C>(draw: &Draw, angle: f32, c: C, s: f32)
 where
     C: Copy + IntoLinSrgba<f32>,
 {
@@ -69,7 +69,7 @@ fn with_opacity(c: nannou::color::Srgb<u8>, o: f32) -> nannou::color::rgb::Srgba
     )
 }
 
-fn grid(draw: &app::Draw) {
+fn grid(draw: &Draw) {
     let spacing = 50.;
     let sz = 6;
     let end = sz as f32 * spacing;

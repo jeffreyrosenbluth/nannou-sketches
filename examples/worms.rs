@@ -107,10 +107,10 @@ fn view(app: &App, m: &Model, frame: Frame) {
         draw.ellipse().xy(m.c[i].position).color(WHITE).w_h(r, r);
     }
     draw.to_frame(app, &frame).unwrap();
-    if app.elapsed_frames() < 1440 && app.elapsed_frames() % 4 ==0 {
-        let file_path = captured_frame_path(app, &frame);
-        app.main_window().capture_frame(file_path);
-    }
+    // if app.elapsed_frames() < 1440 && app.elapsed_frames() % 4 ==0 {
+    //     let file_path = captured_frame_path(app, &frame);
+    //     app.main_window().capture_frame(file_path);
+    // }
 }
 
 

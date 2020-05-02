@@ -8,7 +8,7 @@ edition = "2018"
 
 [dependencies]
 nannou = "0.13"
-nannou_audio = "0.2"
+primes = "0.3"
 
 [[example]]
 name = "dolphin"

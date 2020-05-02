@@ -93,13 +93,13 @@ fn view(app: &App, m: &Model, frame: Frame) {
         }
     }
     draw.to_frame(app, &frame).unwrap();
-    if app.elapsed_frames() < 360 {
-        let file_path = captured_frame_path(app, &frame);
-        app.main_window().capture_frame(file_path);
-    }
+    // if app.elapsed_frames() < 360 {
+    //     let file_path = captured_frame_path(app, &frame);
+    //     app.main_window().capture_frame(file_path);
+    // }
 }
 
-fn square(draw: &app::Draw, position: Point2, rot: f32, col: Rgb<u8>) {
+fn square(draw: &Draw, position: Point2, rot: f32, col: Rgb<u8>) {
     draw.rect()
         .w_h(40., 40.)
         .xy(position)
