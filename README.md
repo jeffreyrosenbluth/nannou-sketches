@@ -56,3 +56,11 @@ Uses OpenSimplex noise and creates a noise loop.
 [[source code]](https://github.com/jeffreyrosenbluth/nannou-sketches/blob/master/examples/reveal.rs)
 
 ***
+
+# Wicker
+
+![Reveal](https://github.com/jeffreyrosenbluth/nannou-sketches/raw/master/gif/wicker.gif)
+
+[[source code]](https://github.com/jeffreyrosenbluth/nannou-sketches/blob/master/examples/wicker.rs)
+
+***

@@ -2,9 +2,10 @@ use nannou::noise::NoiseFn;
 use nannou::prelude::*;
 use primes::is_prime;
 use sketches::with_opacity;
+use sketches::captured_frame_path;
 
-const H: f32 = 900.0;
-const W: f32 = 1200.0;
+const H: f32 = 450.0;
+const W: f32 = 600.0;
 fn main() {
     nannou::app(model).update(update).run();
 }
@@ -16,7 +17,11 @@ struct Model {
 }
 
 fn model(app: &App) -> Model {
-    app.new_window().size(W as u32, H as u32).view(view).build().unwrap();
+    app.new_window()
+        .size(W as u32, H as u32)
+        .view(view)
+        .build()
+        .unwrap();
     Model {
         slope: 0.0,
         b: -H / 2.0,
@@ -46,10 +51,19 @@ fn view(app: &App, model: &Model, frame: Frame) {
     if frame.nth() == 0 {
         draw.background().color(CORNSILK);
     }
-    let c = if is_prime(frame.nth()) { with_opacity(GOLDENROD, 0.075) } else { with_opacity(BLACK, 0.1) };
+    let c = if is_prime(frame.nth()) {
+        with_opacity(GOLDENROD, 0.075)
+    } else {
+        with_opacity(BLACK, 0.1)
+    };
     draw.line()
         .points(pt2(x0, y0), pt2(x1, y1))
         .weight(model.thickness)
         .color(c);
     draw.to_frame(app, &frame).unwrap();
+
+    if frame.nth() % 80 == 0 && frame.nth() < 360 * 80{
+        let file_path = captured_frame_path(app, &frame);
+        app.main_window().capture_frame(file_path);
+    }
 }
