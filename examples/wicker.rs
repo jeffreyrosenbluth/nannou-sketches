@@ -4,8 +4,8 @@ use primes::is_prime;
 use sketches::with_opacity;
 use sketches::captured_frame_path;
 
-const H: f32 = 450.0;
-const W: f32 = 600.0;
+const H: f32 = 900.0;
+const W: f32 = 1200.0;
 fn main() {
     nannou::app(model).update(update).run();
 }
@@ -62,8 +62,8 @@ fn view(app: &App, model: &Model, frame: Frame) {
         .color(c);
     draw.to_frame(app, &frame).unwrap();
 
-    if frame.nth() % 80 == 0 && frame.nth() < 360 * 80{
-        let file_path = captured_frame_path(app, &frame);
-        app.main_window().capture_frame(file_path);
-    }
+    // if frame.nth() % 80 == 0 && frame.nth() < 360 * 80 {
+    //     let file_path = captured_frame_path(app, &frame);
+    //     app.main_window().capture_frame(file_path);
+    // }
 }

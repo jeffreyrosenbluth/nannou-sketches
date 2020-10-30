@@ -21,11 +21,11 @@ struct Boid {
 impl Boid {
     fn new(x: f32, y: f32) -> Self {
         let position = vec2(x, y);
-        let velocity = vec2(random_range(-1., 1.), random_range(-1., 1.)).with_magnitude(4.);
-        let acceleration = vec2(0., 0.);
-        let r = 5.;
+        let velocity = vec2(random_range(-1.0, 1.0), random_range(-1.0, 1.0)).with_magnitude(4.0);
+        let acceleration = vec2(0.0, 0.0);
+        let r = 5.0;
         let max_force = 0.16;
-        let max_speed = 4.;
+        let max_speed = 4.0;
 
         Boid {
             position,
@@ -41,8 +41,8 @@ impl Boid {
         &self,
         boids: &Vec<Boid>,
         dist: f32,
-        acc: &dyn Fn(&Boid) -> Vector2,
-        steer: &dyn Fn(Vector2, i32) -> Vector2,
+        acc: impl Fn(&Boid) -> Vector2,
+        steer: impl Fn(Vector2, i32) -> Vector2,
     ) -> Vector2 {
         let mut sum = vec2(0., 0.);
         let mut count = 0;
@@ -117,9 +117,9 @@ impl Boid {
 }
 
 fn model(app: &App) -> Model {
-    app.new_window().size(1000, 800).view(view).build().unwrap();
+    app.new_window().size(1500, 1000).view(view).build().unwrap();
     let mut boids = Vec::new();
-    for _ in 0..300 {
+    for _ in 0..200 {
         let x = random_range(-50., 50.);
         let y = random_range(-50., 50.);
         boids.push(Boid::new(x, y));
@@ -132,7 +132,7 @@ fn update(app: &App, m: &mut Model, _update: Update) {
     let mut ali = Vec::new();
     let mut coh = Vec::new();
     for boid in &m.boids {
-        sep.push(boid.separate(&m.boids, 50.) * 1.5);
+        sep.push(boid.separate(&m.boids, 50.) * 1.2);
         ali.push(boid.align(&m.boids, 100.));
         coh.push(boid.cohesion(&m.boids, 100.));
     }
@@ -160,8 +160,13 @@ fn display(boid: &Boid, draw: &Draw) {
         ..
     } = boid;
 
-    let theta = (velocity.angle() + PI / 2.) * -1.;
-    let points = vec![pt2(0., -r * 2.), pt2(-r, r * 2.), pt2(0., *r), pt2(*r, r * 2.)];
+    let theta = velocity.angle() + PI / 2.;
+    let points = vec![
+        pt2(0., -r * 2.),
+        pt2(-r, r * 2.),
+        pt2(0., *r),
+        pt2(*r, r * 2.),
+    ];
     draw.polygon()
         .points(points)
         .xy(*position)

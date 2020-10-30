@@ -45,7 +45,7 @@ pub fn rotate_pt(p: Point2<f32>, turn: f32) -> Point2<f32> {
     pt2(q.x, q.y)
 }
 
-pub fn circle_mask<T>(draw: &app::Draw, width: f32, height: f32, radius: f32, color: T)
+pub fn circle_mask<T>(draw: &Draw, width: f32, height: f32, radius: f32, color: T)
 where T: IntoLinSrgba<f32>
  {
     use nannou::geom::path::Builder;
