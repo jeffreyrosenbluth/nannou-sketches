@@ -23,8 +23,8 @@ impl Boid {
         let position = vec2(x, y);
         let velocity = vec2(random_range(-1.0, 1.0), random_range(-1.0, 1.0)).with_magnitude(4.0);
         let acceleration = vec2(0.0, 0.0);
-        let r = 5.0;
-        let max_force = 0.16;
+        let r = 3.0;
+        let max_force = 1.0;
         let max_speed = 4.0;
 
         Boid {
@@ -119,9 +119,9 @@ impl Boid {
 fn model(app: &App) -> Model {
     app.new_window().size(1500, 1000).view(view).build().unwrap();
     let mut boids = Vec::new();
-    for _ in 0..200 {
-        let x = random_range(-50., 50.);
-        let y = random_range(-50., 50.);
+    for _ in 0..1000 {
+        let x = random_range(-750., 750.);
+        let y = random_range(-500., 500.);
         boids.push(Boid::new(x, y));
     }
     Model { boids }
