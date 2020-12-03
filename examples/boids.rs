@@ -134,7 +134,7 @@ fn model(app: &App) -> Model {
         .build()
         .unwrap();
     let mut boids = Vec::new();
-    for _ in 0..1000 {
+    for _ in 0..200 {
         let x = random_range(-750., 750.);
         let y = random_range(-500., 500.);
         boids.push(Boid::new(x, y));
