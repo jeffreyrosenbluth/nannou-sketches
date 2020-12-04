@@ -1,6 +1,6 @@
 use nannou::prelude::*;
 
-const CAPACITY: usize = 32;
+const CAPACITY: usize = 64;
 
 pub fn blq(bl: Point2, tr: Point2) -> (Point2, Point2) {
     let mid = (bl + tr) / 2.0;
@@ -100,7 +100,7 @@ impl<T: Position + Clone> QNode<T> {
     pub fn insert(&mut self, p: T, bl: Point2, tr: Point2) {
         let midx = (bl.x + tr.x) / 2.0;
         let midy = (bl.y + tr.y) / 2.0;
-        let mid = (bl + tr) / 2.0;
+        let mid = vec2(midx, midy);
         match self {
             QNode::Points(pts) => {
                 pts.push(p);
@@ -125,8 +125,11 @@ impl<T: Position + Clone> QNode<T> {
         }
     }
 
-    pub fn points_in_circle(self, bl: Point2, tr: Point2, center: Point2, radius: f32) -> Vec<T> {
+    pub fn points_in_circle(&self, bl: Point2, tr: Point2, center: Point2, radius: f32) -> Vec<T> {
         let mut pts = vec![];
+        if !intersects(bl, tr, center, radius) {
+            return pts;
+        }
         match self {
             QNode::Points(ps) => {
                 for p in ps {
@@ -134,30 +137,22 @@ impl<T: Position + Clone> QNode<T> {
                         + (p.pos().y - center.y) * (p.pos().y - center.y)
                         <= radius * radius
                     {
-                        pts.push(p);
+                        pts.push(p.clone());
                     }
                 }
             }
             QNode::Quad(q) => {
                 let (a, b) = blq(bl, tr);
-                if intersects(a, b, center, radius) {
-                    pts.append(&mut q.bl.points_in_circle(a, b, center, radius));
-                }
+                pts.append(&mut q.bl.points_in_circle(a, b, center, radius));
 
                 let (a, b) = brq(bl, tr);
-                if intersects(a, b, center, radius) {
-                    pts.append(&mut q.br.points_in_circle(a, b, center, radius));
-                }
+                pts.append(&mut q.br.points_in_circle(a, b, center, radius));
 
                 let (a, b) = tlq(bl, tr);
-                if intersects(a, b, center, radius) {
-                    pts.append(&mut q.tl.points_in_circle(a, b, center, radius));
-                }
+                pts.append(&mut q.tl.points_in_circle(a, b, center, radius));
 
                 let (a, b) = trq(bl, tr);
-                if intersects(a, b, center, radius) {
-                    pts.append(&mut q.tr.points_in_circle(a, b, center, radius));
-                }
+                pts.append(&mut q.tr.points_in_circle(a, b, center, radius));
             }
         }
         pts
