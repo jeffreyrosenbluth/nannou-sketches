@@ -38,10 +38,10 @@ impl Position for Point2 {
 
 #[derive(Debug, Clone)]
 pub struct Quadrants<T> {
-    bl: Box<QNode<T>>,
-    br: Box<QNode<T>>,
-    tl: Box<QNode<T>>,
-    tr: Box<QNode<T>>,
+    pub bl: Box<QNode<T>>,
+    pub br: Box<QNode<T>>,
+    pub tl: Box<QNode<T>>,
+    pub tr: Box<QNode<T>>,
 }
 
 impl<T> Quadrants<T> {

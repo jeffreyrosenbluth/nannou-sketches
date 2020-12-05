@@ -1,6 +1,7 @@
 use nannou::prelude::*;
 use nannou::Draw;
 use sketches::quadtree::*;
+use nannou::conrod_core::color::DARK_CHARCOAL;
 
 fn main() {
     nannou::app(model).update(update).run();
@@ -8,6 +9,7 @@ fn main() {
 
 struct Model {
     boids: Vec<Boid>,
+    qtree: Box<QNode<Boid>>,
 }
 
 #[derive(Clone, PartialEq)]
@@ -138,7 +140,8 @@ fn model(app: &App) -> Model {
         boids.push(Boid::new(x, y));
     }
     boids[0].highlight = true;
-    Model { boids }
+    let qtree = Box::new(QNode::Points(vec![]));
+    Model { boids, qtree }
 }
 
 fn update(app: &App, m: &mut Model, _update: Update) {
@@ -149,6 +152,7 @@ fn update(app: &App, m: &mut Model, _update: Update) {
     for b in &m.boids {
         quad_tree.insert(b.clone(), vec2(-750.0, -500.0), vec2(750.0, 500.0));
     }
+    m.qtree = Box::new(quad_tree.clone());
     for boid in &m.boids {
         let sep_flock =
             quad_tree.points_in_circle(vec2(-750.0, -500.0), vec2(750.0, 500.0), boid.pos(), 25.0);
@@ -168,10 +172,46 @@ fn update(app: &App, m: &mut Model, _update: Update) {
 fn view(app: &App, m: &Model, frame: Frame) {
     let draw = app.draw();
     draw.background().color(BLACK);
+    draw_qtree(m.qtree.clone(), vec2(-750., -500.), vec2(750., 500.), &draw);
     for boid in &m.boids {
         display(&boid, &draw);
     }
     draw.to_frame(app, &frame).unwrap();
+}
+
+fn centered_rect(bl: Point2, tr: Point2) -> (Point2, Point2) {
+    ((bl + tr) / 2.0, tr - bl)
+}
+
+fn draw_rect(bl: Point2, tr: Point2, draw: &Draw) {
+    let (ctr, dims) = centered_rect(bl, tr);
+    draw.rect()
+        .xy(ctr)
+        .wh(dims)
+        .color(BLACK)
+        .stroke_color(GRAY)
+        .stroke_weight(0.5);
+}
+
+
+fn draw_qtree(qtree: Box<QNode<Boid>>, bl: Point2, tr: Point2, draw: &Draw) {
+    match *qtree {
+        QNode::Points(_) => draw_rect(bl, tr, draw),
+        QNode::Quad(qs) => {
+            let (a, b) = blq(bl, tr);
+            draw_rect(a, b, draw);
+            draw_qtree(qs.bl, a, b, draw);
+            let (a, b) = brq(bl, tr);
+            draw_rect(a, b, draw);
+            draw_qtree(qs.br, a, b, draw);
+            let (a, b) = tlq(bl, tr);
+            draw_rect(a, b, draw);
+            draw_qtree(qs.tl, a, b, draw);
+            let (a, b) = trq(bl, tr);
+            draw_rect(a, b, draw);
+            draw_qtree(qs.tr, a, b, draw);
+        }
+    }
 }
 
 fn display(boid: &Boid, draw: &Draw) {
