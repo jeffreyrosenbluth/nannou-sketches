@@ -4,6 +4,8 @@ use nannou::math::{Basis2, Rad};
 use nannou::color::white_point::D65;
 use nannou::color::{Alpha, Lab, Laba, IntoLinSrgba};
 
+pub mod quadtree;
+
 pub fn captured_frame_path(app: &App, frame: &Frame) -> std::path::PathBuf {
     // Create a path that we want to save this frame to.
     app.project_path()
