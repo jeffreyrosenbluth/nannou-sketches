@@ -6,6 +6,9 @@ fn main() {
     nannou::app(model).update(update).run();
 }
 
+const MAXFORCE: f32 = 0.05;
+const MAXSPEED: f32 = 2.5;
+
 struct Model {
     boids: Vec<Boid>,
     qtree: Box<QNode<Boid>>,
@@ -17,8 +20,6 @@ struct Boid {
     velocity: Vector2,
     acceleration: Vector2,
     r: f32,
-    max_force: f32,
-    max_speed: f32,
     highlight: bool,
 }
 
@@ -30,12 +31,10 @@ impl Position for Boid {
 
 impl Boid {
     fn new(x: f32, y: f32) -> Self {
-        let position = vec2(x, y);
+        let position = pt2(x, y);
         let velocity = vec2(0.0, 0.0);
         let acceleration = vec2(0.0, 0.0);
         let r = 2.0;
-        let max_force = 0.05;
-        let max_speed = 2.5;
         let highlight = false;
 
         Boid {
@@ -43,8 +42,6 @@ impl Boid {
             velocity,
             acceleration,
             r,
-            max_force,
-            max_speed,
             highlight,
         }
     }
@@ -72,8 +69,7 @@ impl Boid {
 
     fn align(&self, boids: &Vec<Boid>) -> Vector2 {
         let steer = |s: Vector2, c: i32| {
-            ((s / c as f32).with_magnitude(self.max_speed) - self.velocity)
-                .limit_magnitude(self.max_force)
+            ((s / c as f32).with_magnitude(MAXSPEED) - self.velocity).limit_magnitude(MAXFORCE)
         };
         self.tally(boids, &|b: &Boid| b.velocity, &steer)
     }
@@ -82,8 +78,7 @@ impl Boid {
         let acc = |b: &Boid| (self.position - b.position).with_magnitude(1. / dist);
         let steer = |s: Vector2, _c: i32| {
             if s.magnitude() > 0. {
-                return (s.with_magnitude(self.max_speed) - self.velocity)
-                    .limit_magnitude(self.max_force);
+                return (s.with_magnitude(MAXSPEED) - self.velocity).limit_magnitude(MAXFORCE);
             } else {
                 return vec2(0., 0.);
             }
@@ -98,16 +93,16 @@ impl Boid {
 
     fn update(&mut self) {
         self.velocity += self.acceleration;
-        self.velocity.limit_magnitude(self.max_speed);
+        self.velocity.limit_magnitude(MAXSPEED);
         self.position += self.velocity;
         self.acceleration *= 0.;
     }
 
     fn seek(&self, target: Vector2) -> Vector2 {
         let desired = target - self.position;
-        let des = desired.with_magnitude(self.max_speed);
+        let des = desired.with_magnitude(MAXSPEED);
         let steer = des - self.velocity;
-        steer.limit_magnitude(self.max_force)
+        steer.limit_magnitude(MAXFORCE)
     }
 
     fn borders(&mut self, win: &Rect) {
@@ -127,6 +122,7 @@ impl Boid {
 }
 
 fn model(app: &App) -> Model {
+    const BOID_COUNT: usize = 1000;
     app.new_window()
         .size(1500, 1000)
         .view(view)
@@ -135,7 +131,7 @@ fn model(app: &App) -> Model {
     let bl = app.window_rect().bottom_left();
     let tr = app.window_rect().top_right();
     let mut boids = Vec::new();
-    for _ in 0..1000 {
+    for _ in 0..BOID_COUNT {
         let x = random_range(bl.x, tr.x);
         let y = random_range(bl.y, tr.y);
         boids.push(Boid::new(x, y));
@@ -157,10 +153,8 @@ fn update(app: &App, m: &mut Model, _update: Update) {
     }
     m.qtree = Box::new(quad_tree.clone());
     for boid in &m.boids {
-        let sep_flock =
-            quad_tree.points_in_circle(bl, tr, boid.pos(), 25.0);
-        let flock =
-            quad_tree.points_in_circle(bl, tr, boid.pos(), 100.0);
+        let sep_flock = quad_tree.points_in_circle(bl, tr, boid.pos(), 25.0);
+        let flock = quad_tree.points_in_circle(bl, tr, boid.pos(), 100.0);
         sep.push(boid.separate(&sep_flock, 25.0) * 1.5);
         ali.push(boid.align(&flock));
         coh.push(boid.cohesion(&flock));
@@ -198,7 +192,6 @@ fn draw_rect(bl: Point2, tr: Point2, draw: &Draw) {
         .stroke_weight(0.5);
 }
 
-
 fn draw_qtree(qtree: Box<QNode<Boid>>, bl: Point2, tr: Point2, draw: &Draw) {
     match *qtree {
         QNode::Points(_) => draw_rect(bl, tr, draw),
@@ -230,10 +223,12 @@ fn display(boid: &Boid, draw: &Draw) {
 
     let theta = velocity.angle() + PI / 2.;
     let mut c = PLUM;
-    let mut r = *r;
+    let r = *r;
+
     if *highlight {
-        c = ORANGE;
-        r = 3.5;
+        c = RED;
+        draw.ellipse().color(BLACK).w_h(200., 200.).xy(*position).stroke_weight(0.5).stroke(BLUE);
+        draw.ellipse().color(BLACK).w_h(50., 50.).xy(*position).stroke_weight(0.5).stroke(YELLOW);
     }
     let points = vec![
         pt2(0., -r * 2.),

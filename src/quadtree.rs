@@ -9,15 +9,15 @@ pub fn blq(bl: Point2, tr: Point2) -> (Point2, Point2) {
 
 pub fn brq(bl: Point2, tr: Point2) -> (Point2, Point2) {
     (
-        vec2((bl.x + tr.x) / 2.0, bl.y),
-        vec2(tr.x, (bl.y + tr.y) / 2.0),
+        pt2((bl.x + tr.x) / 2.0, bl.y),
+        pt2(tr.x, (bl.y + tr.y) / 2.0),
     )
 }
 
 pub fn tlq(bl: Point2, tr: Point2) -> (Point2, Point2) {
     (
-        vec2(bl.x, (bl.y + tr.y) / 2.0),
-        vec2((bl.x + tr.x) / 2.0, tr.y),
+        pt2(bl.x, (bl.y + tr.y) / 2.0),
+        pt2((bl.x + tr.x) / 2.0, tr.y),
     )
 }
 
@@ -100,7 +100,7 @@ impl<T: Position + Clone> QNode<T> {
     pub fn insert(&mut self, p: T, bl: Point2, tr: Point2) {
         let midx = (bl.x + tr.x) / 2.0;
         let midy = (bl.y + tr.y) / 2.0;
-        let mid = vec2(midx, midy);
+        let mid = pt2(midx, midy);
         match self {
             QNode::Points(pts) => {
                 pts.push(p);
@@ -112,12 +112,12 @@ impl<T: Position + Clone> QNode<T> {
                 if p.pos().y <= midy {
                     q.bl.insert(p, bl, mid);
                 } else {
-                    q.tl.insert(p, vec2(bl.x, midy), vec2(midx, tr.y));
+                    q.tl.insert(p, pt2(bl.x, midy), pt2(midx, tr.y));
                 }
             }
             QNode::Quad(q) => {
                 if p.pos().y <= midy {
-                    q.br.insert(p, vec2(midx, bl.y), vec2(tr.x, midy));
+                    q.br.insert(p, pt2(midx, bl.y), pt2(tr.x, midy));
                 } else {
                     q.tr.insert(p, mid, tr);
                 }
@@ -178,12 +178,12 @@ mod tests {
         let mut qt = QNode::Points(pts);
         for _ in 0..1000 {
             qt.insert(
-                vec2(random_range(0.0, 3.0), random_range(0.0, 3.0)),
-                vec2(0., 0.),
-                vec2(3., 3.),
+                pt2(random_range(0.0, 3.0), random_range(0.0, 3.0)),
+                pt2(0., 0.),
+                pt2(3., 3.),
             );
         }
-        let c = qt.points_in_circle(vec2(0.0, 0.0), vec2(3.0, 3.0), vec2(2.0, 0.5), 0.2);
+        let c = qt.points_in_circle(pt2(0.0, 0.0), pt2(3.0, 3.0), pt2(2.0, 0.5), 0.2);
         dbg!(c);
     }
 }
