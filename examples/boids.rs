@@ -1,5 +1,7 @@
 use nannou::prelude::*;
 use nannou::Draw;
+use sketches::quadtree::*;
+use nannou::conrod_core::color::DARK_CHARCOAL;
 
 fn main() {
     nannou::app(model).update(update).run();
@@ -7,8 +9,10 @@ fn main() {
 
 struct Model {
     boids: Vec<Boid>,
+    qtree: Box<QNode<Boid>>,
 }
 
+#[derive(Clone, PartialEq)]
 struct Boid {
     position: Vector2,
     velocity: Vector2,
@@ -16,6 +20,13 @@ struct Boid {
     r: f32,
     max_force: f32,
     max_speed: f32,
+    highlight: bool,
+}
+
+impl Position for Boid {
+    fn pos(&self) -> Point2 {
+        self.position
+    }
 }
 
 impl Boid {
@@ -23,9 +34,10 @@ impl Boid {
         let position = vec2(x, y);
         let velocity = vec2(random_range(-1.0, 1.0), random_range(-1.0, 1.0)).with_magnitude(4.0);
         let acceleration = vec2(0.0, 0.0);
-        let r = 5.0;
-        let max_force = 0.16;
-        let max_speed = 4.0;
+        let r = 2.0;
+        let max_force = 0.05;
+        let max_speed = 2.5;
+        let highlight = false;
 
         Boid {
             position,
@@ -34,21 +46,20 @@ impl Boid {
             r,
             max_force,
             max_speed,
+            highlight,
         }
     }
 
     fn tally(
         &self,
         boids: &Vec<Boid>,
-        dist: f32,
         acc: impl Fn(&Boid) -> Vector2,
         steer: impl Fn(Vector2, i32) -> Vector2,
     ) -> Vector2 {
         let mut sum = vec2(0., 0.);
         let mut count = 0;
         for b in boids {
-            let d = self.position.distance(b.position);
-            if d > 0. && d < dist {
+            if b != self {
                 sum += acc(b);
                 count += 1;
             }
@@ -60,12 +71,12 @@ impl Boid {
         }
     }
 
-    fn align(&self, boids: &Vec<Boid>, dist: f32) -> Vector2 {
+    fn align(&self, boids: &Vec<Boid>) -> Vector2 {
         let steer = |s: Vector2, c: i32| {
             ((s / c as f32).with_magnitude(self.max_speed) - self.velocity)
                 .limit_magnitude(self.max_force)
         };
-        self.tally(boids, dist, &|b: &Boid| b.velocity, &steer)
+        self.tally(boids, &|b: &Boid| b.velocity, &steer)
     }
 
     fn separate(&self, boids: &Vec<Boid>, dist: f32) -> Vector2 {
@@ -78,12 +89,12 @@ impl Boid {
                 return vec2(0., 0.);
             }
         };
-        self.tally(boids, dist, &acc, &steer)
+        self.tally(boids, &acc, &steer)
     }
 
-    fn cohesion(&self, boids: &Vec<Boid>, dist: f32) -> Vector2 {
+    fn cohesion(&self, boids: &Vec<Boid>) -> Vector2 {
         let steer = |s: Vector2, c: i32| self.seek(s / c as f32);
-        self.tally(boids, dist, &|b: &Boid| b.position, &steer)
+        self.tally(boids, &|b: &Boid| b.position, &steer)
     }
 
     fn update(&mut self) {
@@ -117,24 +128,39 @@ impl Boid {
 }
 
 fn model(app: &App) -> Model {
-    app.new_window().size(1500, 1000).view(view).build().unwrap();
+    app.new_window()
+        .size(1500, 1000)
+        .view(view)
+        .build()
+        .unwrap();
     let mut boids = Vec::new();
-    for _ in 0..200 {
-        let x = random_range(-50., 50.);
-        let y = random_range(-50., 50.);
+    for _ in 0..1000 {
+        let x = random_range(-750., 750.);
+        let y = random_range(-500., 500.);
         boids.push(Boid::new(x, y));
     }
-    Model { boids }
+    boids[0].highlight = true;
+    let qtree = Box::new(QNode::Points(vec![]));
+    Model { boids, qtree }
 }
 
 fn update(app: &App, m: &mut Model, _update: Update) {
     let mut sep = Vec::new();
     let mut ali = Vec::new();
     let mut coh = Vec::new();
+    let quad_tree = &mut QNode::Points(vec![]);
+    for b in &m.boids {
+        quad_tree.insert(b.clone(), vec2(-750.0, -500.0), vec2(750.0, 500.0));
+    }
+    m.qtree = Box::new(quad_tree.clone());
     for boid in &m.boids {
-        sep.push(boid.separate(&m.boids, 50.) * 1.2);
-        ali.push(boid.align(&m.boids, 100.));
-        coh.push(boid.cohesion(&m.boids, 100.));
+        let sep_flock =
+            quad_tree.points_in_circle(vec2(-750.0, -500.0), vec2(750.0, 500.0), boid.pos(), 25.0);
+        let flock =
+            quad_tree.points_in_circle(vec2(-750.0, -500.0), vec2(750.0, 500.0), boid.pos(), 100.0);
+        sep.push(boid.separate(&sep_flock, 25.0) * 1.5);
+        ali.push(boid.align(&flock));
+        coh.push(boid.cohesion(&flock));
     }
     for (i, boid) in m.boids.iter_mut().enumerate() {
         boid.acceleration += sep[i] + ali[i] + coh[i];
@@ -146,10 +172,46 @@ fn update(app: &App, m: &mut Model, _update: Update) {
 fn view(app: &App, m: &Model, frame: Frame) {
     let draw = app.draw();
     draw.background().color(BLACK);
+    draw_qtree(m.qtree.clone(), vec2(-750., -500.), vec2(750., 500.), &draw);
     for boid in &m.boids {
         display(&boid, &draw);
     }
     draw.to_frame(app, &frame).unwrap();
+}
+
+fn centered_rect(bl: Point2, tr: Point2) -> (Point2, Point2) {
+    ((bl + tr) / 2.0, tr - bl)
+}
+
+fn draw_rect(bl: Point2, tr: Point2, draw: &Draw) {
+    let (ctr, dims) = centered_rect(bl, tr);
+    draw.rect()
+        .xy(ctr)
+        .wh(dims)
+        .color(BLACK)
+        .stroke_color(GRAY)
+        .stroke_weight(0.5);
+}
+
+
+fn draw_qtree(qtree: Box<QNode<Boid>>, bl: Point2, tr: Point2, draw: &Draw) {
+    match *qtree {
+        QNode::Points(_) => draw_rect(bl, tr, draw),
+        QNode::Quad(qs) => {
+            let (a, b) = blq(bl, tr);
+            draw_rect(a, b, draw);
+            draw_qtree(qs.bl, a, b, draw);
+            let (a, b) = brq(bl, tr);
+            draw_rect(a, b, draw);
+            draw_qtree(qs.br, a, b, draw);
+            let (a, b) = tlq(bl, tr);
+            draw_rect(a, b, draw);
+            draw_qtree(qs.tl, a, b, draw);
+            let (a, b) = trq(bl, tr);
+            draw_rect(a, b, draw);
+            draw_qtree(qs.tr, a, b, draw);
+        }
+    }
 }
 
 fn display(boid: &Boid, draw: &Draw) {
@@ -157,19 +219,26 @@ fn display(boid: &Boid, draw: &Draw) {
         position,
         velocity,
         r,
+        highlight,
         ..
     } = boid;
 
     let theta = velocity.angle() + PI / 2.;
+    let mut c = PLUM;
+    let mut r = *r;
+    if *highlight {
+        c = RED;
+        r = 1.5 * r;
+    }
     let points = vec![
         pt2(0., -r * 2.),
         pt2(-r, r * 2.),
-        pt2(0., *r),
-        pt2(*r, r * 2.),
+        pt2(0., r),
+        pt2(r, r * 2.),
     ];
     draw.polygon()
         .points(points)
         .xy(*position)
-        .color(PLUM)
+        .color(c)
         .rotate(theta);
 }
