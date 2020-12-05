@@ -1,7 +1,6 @@
 use nannou::prelude::*;
 use nannou::Draw;
 use sketches::quadtree::*;
-use nannou::conrod_core::color::DARK_CHARCOAL;
 
 fn main() {
     nannou::app(model).update(update).run();
@@ -32,7 +31,7 @@ impl Position for Boid {
 impl Boid {
     fn new(x: f32, y: f32) -> Self {
         let position = vec2(x, y);
-        let velocity = vec2(random_range(-1.0, 1.0), random_range(-1.0, 1.0)).with_magnitude(4.0);
+        let velocity = vec2(0.0, 0.0);
         let acceleration = vec2(0.0, 0.0);
         let r = 2.0;
         let max_force = 0.05;
@@ -133,10 +132,12 @@ fn model(app: &App) -> Model {
         .view(view)
         .build()
         .unwrap();
+    let bl = app.window_rect().bottom_left();
+    let tr = app.window_rect().top_right();
     let mut boids = Vec::new();
     for _ in 0..1000 {
-        let x = random_range(-750., 750.);
-        let y = random_range(-500., 500.);
+        let x = random_range(bl.x, tr.x);
+        let y = random_range(bl.y, tr.y);
         boids.push(Boid::new(x, y));
     }
     boids[0].highlight = true;
@@ -145,19 +146,21 @@ fn model(app: &App) -> Model {
 }
 
 fn update(app: &App, m: &mut Model, _update: Update) {
+    let bl = app.window_rect().bottom_left();
+    let tr = app.window_rect().top_right();
     let mut sep = Vec::new();
     let mut ali = Vec::new();
     let mut coh = Vec::new();
     let quad_tree = &mut QNode::Points(vec![]);
     for b in &m.boids {
-        quad_tree.insert(b.clone(), vec2(-750.0, -500.0), vec2(750.0, 500.0));
+        quad_tree.insert(b.clone(), bl, tr);
     }
     m.qtree = Box::new(quad_tree.clone());
     for boid in &m.boids {
         let sep_flock =
-            quad_tree.points_in_circle(vec2(-750.0, -500.0), vec2(750.0, 500.0), boid.pos(), 25.0);
+            quad_tree.points_in_circle(bl, tr, boid.pos(), 25.0);
         let flock =
-            quad_tree.points_in_circle(vec2(-750.0, -500.0), vec2(750.0, 500.0), boid.pos(), 100.0);
+            quad_tree.points_in_circle(bl, tr, boid.pos(), 100.0);
         sep.push(boid.separate(&sep_flock, 25.0) * 1.5);
         ali.push(boid.align(&flock));
         coh.push(boid.cohesion(&flock));
@@ -170,9 +173,11 @@ fn update(app: &App, m: &mut Model, _update: Update) {
 }
 
 fn view(app: &App, m: &Model, frame: Frame) {
+    let bl = app.window_rect().bottom_left();
+    let tr = app.window_rect().top_right();
     let draw = app.draw();
     draw.background().color(BLACK);
-    draw_qtree(m.qtree.clone(), vec2(-750., -500.), vec2(750., 500.), &draw);
+    draw_qtree(m.qtree.clone(), bl, tr, &draw);
     for boid in &m.boids {
         display(&boid, &draw);
     }
@@ -227,8 +232,8 @@ fn display(boid: &Boid, draw: &Draw) {
     let mut c = PLUM;
     let mut r = *r;
     if *highlight {
-        c = RED;
-        r = 1.5 * r;
+        c = ORANGE;
+        r = 3.5;
     }
     let points = vec![
         pt2(0., -r * 2.),
