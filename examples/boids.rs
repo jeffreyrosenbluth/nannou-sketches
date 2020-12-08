@@ -1,6 +1,8 @@
 use nannou::prelude::*;
+use nannou::ui::prelude::*;
 use nannou::Draw;
 use sketches::quadtree::*;
+use sketches::with_opacity;
 
 fn main() {
     nannou::app(model).update(update).run();
@@ -12,6 +14,27 @@ const MAXSPEED: f32 = 2.5;
 struct Model {
     boids: Vec<Boid>,
     qtree: Box<QNode<Boid>>,
+    ui: Ui,
+    ids: Ids,
+    sep_strength: f32,
+    sep_radius: f32,
+    ali_strength: f32,
+    ali_radius: f32,
+    coh_strength: f32,
+    coh_radius: f32,
+    grid: bool,
+}
+widget_ids! {
+    struct Ids {
+        sep_strength,
+        sep_radius,
+        ali_strength,
+        ali_radius,
+        coh_strength,
+        coh_radius,
+        reset,
+        grid,
+    }
 }
 
 #[derive(Clone, PartialEq)]
@@ -105,7 +128,7 @@ impl Boid {
         steer.limit_magnitude(MAXFORCE)
     }
 
-    fn borders(&mut self, win: &Rect) {
+    fn borders(&mut self, win: &nannou::prelude::Rect) {
         let l = win.left();
         let r = win.right();
         let t = win.top();
@@ -128,6 +151,8 @@ fn model(app: &App) -> Model {
         .view(view)
         .build()
         .unwrap();
+    let mut ui = app.new_ui().build().unwrap();
+    let ids = Ids::new(ui.widget_id_generator());
     let bl = app.window_rect().bottom_left();
     let tr = app.window_rect().top_right();
     let mut boids = Vec::new();
@@ -138,10 +163,126 @@ fn model(app: &App) -> Model {
     }
     boids[0].highlight = true;
     let qtree = Box::new(QNode::Points(vec![]));
-    Model { boids, qtree }
+    let sep_strength = 1.5;
+    let sep_radius = 25.0;
+    let ali_strength = 1.0;
+    let ali_radius = 90.0;
+    let coh_strength = 1.0;
+    let coh_radius = 100.0;
+    let grid = false;
+    Model {
+        boids,
+        qtree,
+        ui,
+        ids,
+        sep_strength,
+        sep_radius,
+        ali_strength,
+        ali_radius,
+        coh_strength,
+        coh_radius,
+        grid,
+    }
 }
 
 fn update(app: &App, m: &mut Model, _update: Update) {
+    let ui = &mut m.ui.set_widgets();
+
+    fn slider(val: f32, min: f32, max: f32) -> widget::Slider<'static, f32> {
+        widget::Slider::new(val, min, max)
+            .w_h(150.0, 24.0)
+            .label_font_size(12)
+            .rgb(33. / 255., 155. / 255., 168. / 255.)
+            .label_rgb(1.0, 1.0, 1.0)
+            .border(0.5)
+            .border_rgb(0.3, 0.3, 0.3)
+    }
+
+    let sep_label = format!("Separation Strength: {:.1}", m.sep_strength);
+    for value in slider(m.sep_strength, 0.0, 5.0)
+        .top_left_with_margin(20.0)
+        .label(&sep_label[..])
+        .set(m.ids.sep_strength, ui)
+    {
+        m.sep_strength = value;
+    }
+
+    let sep_label = format!("Separation Radius: {:.0}", m.sep_radius);
+    for value in slider(m.sep_radius, 0.0, 200.0)
+        .down(10.0)
+        .label(&sep_label[..])
+        .set(m.ids.sep_radius, ui)
+    {
+        m.sep_radius = value;
+    }
+
+    let ali_label = format!("Alignment Strength: {:.1}", m.ali_strength);
+    for value in slider(m.ali_strength, 0.0, 5.0)
+        .down(10.0)
+        .label(&ali_label[..])
+        .set(m.ids.ali_strength, ui)
+    {
+        m.ali_strength = value;
+    }
+
+    let ali_label = format!("Alignment Radius: {:.0}", m.ali_radius);
+    for value in slider(m.ali_radius, 0.0, 200.0)
+        .down(10.0)
+        .label(&ali_label[..])
+        .set(m.ids.ali_radius, ui)
+    {
+        m.ali_radius = value;
+    }
+
+    let coh_label = format!("Cohesion Strength: {:.1}", m.coh_strength);
+    for value in slider(m.coh_strength, 0.0, 5.0)
+        .down(10.0)
+        .label(&coh_label[..])
+        .set(m.ids.coh_strength, ui)
+    {
+        m.coh_strength = value;
+    }
+
+    let coh_label = format!("Cohesion Radius: {:.0}", m.coh_radius);
+    for value in slider(m.coh_radius, 0.0, 200.0)
+        .down(10.0)
+        .label(&coh_label[..])
+        .set(m.ids.coh_radius, ui)
+    {
+        m.coh_radius = value;
+    }
+
+    for _click in widget::Button::new()
+        .down(20.0)
+        .w_h(125.0, 30.0)
+        .label("Reset")
+        .label_font_size(12)
+        .rgb(0.5, 0.3, 0.3)
+        .label_rgb(1.0, 1.0, 1.0)
+        .border(0.0)
+        .set(m.ids.reset, ui)
+    {
+        m.sep_strength = 1.5;
+        m.sep_radius = 25.0;
+        m.ali_strength = 1.0;
+        m.ali_radius = 90.0;
+        m.coh_strength = 1.0;
+        m.coh_radius = 100.0;
+    }
+
+    for _click in widget::Button::new()
+        .down(10.0)
+        .w_h(125.0, 30.0)
+        .label("Toggle Grid")
+        .label_font_size(12)
+        .rgb(0.3, 0.5, 0.3)
+        .label_rgb(1.0, 1.0, 1.0)
+        .border(0.0)
+        .set(m.ids.grid, ui)
+    {
+        m.grid = !m.grid
+    }
+
     let bl = app.window_rect().bottom_left();
     let tr = app.window_rect().top_right();
     let mut sep = Vec::new();
@@ -153,11 +294,12 @@ fn update(app: &App, m: &mut Model, _update: Update) {
     }
     m.qtree = Box::new(quad_tree.clone());
     for boid in &m.boids {
-        let sep_flock = quad_tree.points_in_circle(bl, tr, boid.pos(), 25.0);
-        let flock = quad_tree.points_in_circle(bl, tr, boid.pos(), 100.0);
-        sep.push(boid.separate(&sep_flock, 25.0) * 1.5);
-        ali.push(boid.align(&flock));
-        coh.push(boid.cohesion(&flock));
+        let sep_flock = quad_tree.points_in_circle(bl, tr, boid.pos(), m.sep_radius);
+        let ali_flock = quad_tree.points_in_circle(bl, tr, boid.pos(), m.ali_radius);
+        let coh_flock = quad_tree.points_in_circle(bl, tr, boid.pos(), m.coh_radius);
+        sep.push(boid.separate(&sep_flock, m.sep_radius) * m.sep_strength);
+        ali.push(boid.align(&ali_flock) * m.ali_strength);
+        coh.push(boid.cohesion(&coh_flock) * m.coh_strength);
     }
     for (i, boid) in m.boids.iter_mut().enumerate() {
         boid.acceleration += sep[i] + ali[i] + coh[i];
@@ -171,11 +313,14 @@ fn view(app: &App, m: &Model, frame: Frame) {
     let tr = app.window_rect().top_right();
     let draw = app.draw();
     draw.background().color(BLACK);
-    draw_qtree(m.qtree.clone(), bl, tr, &draw);
+    if m.grid {
+        draw_qtree(m.qtree.clone(), bl, tr, &draw);
+    }
     for boid in &m.boids {
-        display(&boid, &draw);
+        display(&boid, &draw, &m);
     }
     draw.to_frame(app, &frame).unwrap();
+    m.ui.draw_to_frame(app, &frame).unwrap();
 }
 
 fn centered_rect(bl: Point2, tr: Point2) -> (Point2, Point2) {
@@ -212,7 +357,7 @@ fn draw_qtree(qtree: Box<QNode<Boid>>, bl: Point2, tr: Point2, draw: &Draw) {
     }
 }
 
-fn display(boid: &Boid, draw: &Draw) {
+fn display(boid: &Boid, draw: &Draw, m: &Model) {
     let Boid {
         position,
         velocity,
@@ -224,11 +369,30 @@ fn display(boid: &Boid, draw: &Draw) {
     let theta = velocity.angle() + PI / 2.;
     let mut c = PLUM;
     let r = *r;
+    let clear = with_opacity(BLACK, 0.0);
 
     if *highlight {
         c = RED;
-        draw.ellipse().color(BLACK).w_h(200., 200.).xy(*position).stroke_weight(0.5).stroke(BLUE);
-        draw.ellipse().color(BLACK).w_h(50., 50.).xy(*position).stroke_weight(0.5).stroke(YELLOW);
+        draw.ellipse()
+            .color(clear)
+            .w_h(m.coh_radius * 2., m.coh_radius * 2.)
+            .xy(*position)
+            .stroke_weight(0.5)
+            .stroke(GREEN);
+
+        draw.ellipse()
+            .color(clear)
+            .w_h(m.ali_radius * 2., m.ali_radius * 2.)
+            .xy(*position)
+            .stroke_weight(0.5)
+            .stroke(BLUE);
+
+        draw.ellipse()
+            .color(clear)
+            .w_h(m.sep_radius * 2., m.sep_radius * 2.)
+            .xy(*position)
+            .stroke_weight(0.5)
+            .stroke(YELLOW);
     }
     let points = vec![
         pt2(0., -r * 2.),
