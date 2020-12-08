@@ -199,7 +199,7 @@ fn update(app: &App, m: &mut Model, _update: Update) {
     }
 
     let sep_label = format!("Separation Strength: {:.1}", m.sep_strength);
-    for value in slider(m.sep_strength, 0.0, 5.0)
+    for value in slider(m.sep_strength, 0.0, 3.0)
         .top_left_with_margin(20.0)
         .label(&sep_label[..])
         .set(m.ids.sep_strength, ui)
@@ -217,7 +217,7 @@ fn update(app: &App, m: &mut Model, _update: Update) {
     }
 
     let ali_label = format!("Alignment Strength: {:.1}", m.ali_strength);
-    for value in slider(m.ali_strength, 0.0, 5.0)
+    for value in slider(m.ali_strength, 0.0, 3.0)
         .down(10.0)
         .label(&ali_label[..])
         .set(m.ids.ali_strength, ui)
@@ -235,7 +235,7 @@ fn update(app: &App, m: &mut Model, _update: Update) {
     }
 
     let coh_label = format!("Cohesion Strength: {:.1}", m.coh_strength);
-    for value in slider(m.coh_strength, 0.0, 5.0)
+    for value in slider(m.coh_strength, 0.0, 3.0)
         .down(10.0)
         .label(&coh_label[..])
         .set(m.ids.coh_strength, ui)
@@ -254,7 +254,7 @@ fn update(app: &App, m: &mut Model, _update: Update) {
 
     for _click in widget::Button::new()
         .down(20.0)
-        .w_h(125.0, 30.0)
+        .w_h(150.0, 30.0)
         .label("Reset")
         .label_font_size(12)
         .rgb(0.5, 0.3, 0.3)
@@ -272,7 +272,7 @@ fn update(app: &App, m: &mut Model, _update: Update) {
 
     for _click in widget::Button::new()
         .down(10.0)
-        .w_h(125.0, 30.0)
+        .w_h(150.0, 30.0)
         .label("Toggle Grid")
         .label_font_size(12)
         .rgb(0.3, 0.5, 0.3)
