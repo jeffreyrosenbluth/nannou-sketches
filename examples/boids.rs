@@ -36,6 +36,7 @@ widget_ids! {
         reset,
         grid,
         fps,
+        count,
     }
 }
 
@@ -200,16 +201,36 @@ fn update(app: &App, m: &mut Model, _update: Update) {
             .border_rgb(37. / 255., 0.15, 0.15)
     }
 
-    let sep_label = format!("Separation Strength: {:.1}", m.sep_strength);
-    for value in slider(m.sep_strength, 0.0, 3.0)
+    let count_label = format!("Boid Count {:.0}", m.boids.len());
+    for value in slider(m.boids.len() as f32, 0.0, 2000.0)
         .top_left_with_margin(20.0)
+        .label(&count_label[..])
+        .set(m.ids.count, ui)
+    {
+        let bl = app.window_rect().bottom_left();
+        let tr = app.window_rect().top_right();
+        let v = value as usize;
+        if v < m.boids.len() {
+            m.boids.truncate(v);
+        } else {
+            for _ in 0..(v - m.boids.len()) {
+                let x = random_range(bl.x, tr.x);
+                let y = random_range(bl.y, tr.y);
+                m.boids.push(Boid::new(x, y));
+            }
+        }
+    }
+
+    let sep_label = format!("Separation Strength {:.1}", m.sep_strength);
+    for value in slider(m.sep_strength, 0.0, 3.0)
+        .down(10.0)
         .label(&sep_label[..])
         .set(m.ids.sep_strength, ui)
     {
         m.sep_strength = value;
     }
 
-    let sep_label = format!("Separation Radius: {:.0}", m.sep_radius);
+    let sep_label = format!("Separation  {:.0}", m.sep_radius);
     for value in slider(m.sep_radius, 0.0, 200.0)
         .down(10.0)
         .label(&sep_label[..])
@@ -218,7 +239,7 @@ fn update(app: &App, m: &mut Model, _update: Update) {
         m.sep_radius = value;
     }
 
-    let ali_label = format!("Alignment Strength: {:.1}", m.ali_strength);
+    let ali_label = format!("Alignment Strength {:.1}", m.ali_strength);
     for value in slider(m.ali_strength, 0.0, 3.0)
         .down(10.0)
         .label(&ali_label[..])
@@ -227,7 +248,7 @@ fn update(app: &App, m: &mut Model, _update: Update) {
         m.ali_strength = value;
     }
 
-    let ali_label = format!("Alignment Radius: {:.0}", m.ali_radius);
+    let ali_label = format!("Alignment Radius {:.0}", m.ali_radius);
     for value in slider(m.ali_radius, 0.0, 200.0)
         .down(10.0)
         .label(&ali_label[..])
@@ -236,7 +257,7 @@ fn update(app: &App, m: &mut Model, _update: Update) {
         m.ali_radius = value;
     }
 
-    let coh_label = format!("Cohesion Strength: {:.1}", m.coh_strength);
+    let coh_label = format!("Cohesion Strength {:.1}", m.coh_strength);
     for value in slider(m.coh_strength, 0.0, 3.0)
         .down(10.0)
         .label(&coh_label[..])
@@ -245,7 +266,7 @@ fn update(app: &App, m: &mut Model, _update: Update) {
         m.coh_strength = value;
     }
 
-    let coh_label = format!("Cohesion Radius: {:.0}", m.coh_radius);
+    let coh_label = format!("Cohesion Radius {:.0}", m.coh_radius);
     for value in slider(m.coh_radius, 0.0, 200.0)
         .down(10.0)
         .label(&coh_label[..])
