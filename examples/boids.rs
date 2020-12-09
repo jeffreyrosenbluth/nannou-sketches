@@ -34,6 +34,7 @@ widget_ids! {
         coh_radius,
         reset,
         grid,
+        fps,
     }
 }
 
@@ -166,7 +167,7 @@ fn model(app: &App) -> Model {
     let sep_strength = 1.5;
     let sep_radius = 25.0;
     let ali_strength = 1.0;
-    let ali_radius = 90.0;
+    let ali_radius = 75.0;
     let coh_strength = 1.0;
     let coh_radius = 100.0;
     let grid = false;
@@ -192,10 +193,10 @@ fn update(app: &App, m: &mut Model, _update: Update) {
         widget::Slider::new(val, min, max)
             .w_h(150.0, 24.0)
             .label_font_size(12)
-            .rgb(33. / 255., 155. / 255., 168. / 255.)
-            .label_rgb(1.0, 1.0, 1.0)
+            .rgb(75. / 255., 136. / 255., 162. / 255.)
+            .label_rgb(211. / 255., 212. / 255., 217. / 255.)
             .border(0.5)
-            .border_rgb(0.3, 0.3, 0.3)
+            .border_rgb(37. / 255., 38. / 255., 39. / 255.)
     }
 
     let sep_label = format!("Separation Strength: {:.1}", m.sep_strength);
@@ -257,15 +258,15 @@ fn update(app: &App, m: &mut Model, _update: Update) {
         .w_h(150.0, 30.0)
         .label("Reset")
         .label_font_size(12)
-        .rgb(0.5, 0.3, 0.3)
-        .label_rgb(1.0, 1.0, 1.0)
+        .rgb(37. / 255., 38. / 255., 39. / 255.)
+        .label_rgb(211. / 255., 212. / 255., 217. / 255.)
         .border(0.0)
         .set(m.ids.reset, ui)
     {
         m.sep_strength = 1.5;
         m.sep_radius = 25.0;
         m.ali_strength = 1.0;
-        m.ali_radius = 90.0;
+        m.ali_radius = 75.0;
         m.coh_strength = 1.0;
         m.coh_radius = 100.0;
     }
@@ -275,13 +276,22 @@ fn update(app: &App, m: &mut Model, _update: Update) {
         .w_h(150.0, 30.0)
         .label("Toggle Grid")
         .label_font_size(12)
-        .rgb(0.3, 0.5, 0.3)
-        .label_rgb(1.0, 1.0, 1.0)
+        .rgb(37. / 255., 38. / 255., 39. / 255.)
+        .label_rgb(211. / 255., 212. / 255., 217. / 255.)
         .border(0.0)
         .set(m.ids.grid, ui)
     {
         m.grid = !m.grid
     }
+
+    let fps_label = format!("fps {:.0}", app.fps().min(60.0));
+    let _frame_rate = widget::TextBox::new(&fps_label[..])
+        .bottom_left_with_margin(20.0)
+        .w_h(150.0, 30.0)
+        .font_size(12)
+        .text_color(color::Color::Rgba(211./255., 212./255., 217./255., 1.))
+        .rgb(0. / 255., 0. / 255., 0. / 255.)
+        .set(m.ids.fps, ui);
 
     let bl = app.window_rect().bottom_left();
     let tr = app.window_rect().top_right();
@@ -289,10 +299,13 @@ fn update(app: &App, m: &mut Model, _update: Update) {
     let mut ali = Vec::new();
     let mut coh = Vec::new();
     let quad_tree = &mut QNode::Points(vec![]);
+
     for b in &m.boids {
         quad_tree.insert(b.clone(), bl, tr);
     }
+
     m.qtree = Box::new(quad_tree.clone());
+
     for boid in &m.boids {
         let sep_flock = quad_tree.points_in_circle(bl, tr, boid.pos(), m.sep_radius);
         let ali_flock = quad_tree.points_in_circle(bl, tr, boid.pos(), m.ali_radius);
@@ -333,8 +346,8 @@ fn draw_rect(bl: Point2, tr: Point2, draw: &Draw) {
         .xy(ctr)
         .wh(dims)
         .color(BLACK)
-        .stroke_color(GRAY)
-        .stroke_weight(0.5);
+        .stroke_color(rgb8(37, 38, 39))
+        .stroke_weight(1.0);
 }
 
 fn draw_qtree(qtree: Box<QNode<Boid>>, bl: Point2, tr: Point2, draw: &Draw) {
@@ -372,27 +385,27 @@ fn display(boid: &Boid, draw: &Draw, m: &Model) {
     let clear = with_opacity(BLACK, 0.0);
 
     if *highlight {
-        c = RED;
+        c = WHITE;
         draw.ellipse()
             .color(clear)
             .w_h(m.coh_radius * 2., m.coh_radius * 2.)
             .xy(*position)
             .stroke_weight(0.5)
-            .stroke(GREEN);
+            .stroke_color(rgb8(211, 212, 217));
 
         draw.ellipse()
             .color(clear)
             .w_h(m.ali_radius * 2., m.ali_radius * 2.)
             .xy(*position)
             .stroke_weight(0.5)
-            .stroke(BLUE);
+            .stroke_color(rgb8(75, 136, 162));
 
         draw.ellipse()
             .color(clear)
             .w_h(m.sep_radius * 2., m.sep_radius * 2.)
             .xy(*position)
             .stroke_weight(0.5)
-            .stroke(YELLOW);
+            .stroke_color(rgb8(252, 81, 48));
     }
     let points = vec![
         pt2(0., -r * 2.),
