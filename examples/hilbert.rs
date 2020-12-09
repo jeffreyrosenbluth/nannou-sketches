@@ -70,10 +70,15 @@ fn view(app: &App, m: &Model, frame: Frame) {
         let p1 = m.points[m.count - 1];
         let p2 = m.points[m.count];
         let r = Range::new(m.scale as f32, 3. * m.scale as f32);
-        draw.line().weight(6.0).caps_round().color(ORANGE).x_y(-k/2., -k/2.).points(
-            pt2(r.lerp(p1.x), r.lerp(p1.y)),
-            pt2(r.lerp(p2.x), r.lerp(p2.y)),
-        );
+        draw.line()
+            .weight(6.0)
+            .caps_round()
+            .color(ORANGE)
+            .x_y(-k / 2., -k / 2.)
+            .points(
+                pt2(r.lerp(p1.x), r.lerp(p1.y)),
+                pt2(r.lerp(p2.x), r.lerp(p2.y)),
+            );
     }
     draw.to_frame(app, &frame).unwrap();
 }

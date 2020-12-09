@@ -1,6 +1,6 @@
 use nannou::geom::path::Builder;
 use nannou::prelude::*;
-use sketches::{with_opacity, captured_frame_path};
+use sketches::{captured_frame_path, with_opacity};
 
 fn main() {
     nannou::app(model).update(update).run();
@@ -14,7 +14,10 @@ struct Model {
 
 fn model(app: &App) -> Model {
     app.new_window().size(800, 800).view(view).build().unwrap();
-    Model { rects: Vec::new(), alpha: 1.0 }
+    Model {
+        rects: Vec::new(),
+        alpha: 1.0,
+    }
 }
 
 fn update(app: &App, m: &mut Model, _update: Update) {
@@ -30,7 +33,7 @@ fn update(app: &App, m: &mut Model, _update: Update) {
         m.rects.remove(0);
     }
     m.alpha -= 1. / 360.;
-    m.alpha = if m.alpha <= 0.0 {0.0} else {m.alpha};
+    m.alpha = if m.alpha <= 0.0 { 0.0 } else { m.alpha };
 }
 
 fn cutout(builder: Box<Builder>, r: Rect) -> Builder {
@@ -79,7 +82,10 @@ fn view(app: &App, model: &Model, frame: Frame) {
     let p = builder.build();
 
     // draw arc
-    draw.path().fill().color(with_opacity(WHITE, model.alpha)).events(p.iter());
+    draw.path()
+        .fill()
+        .color(with_opacity(WHITE, model.alpha))
+        .events(p.iter());
 
     // Write the result of our drawing to the window's frame.
     draw.to_frame(app, &frame).unwrap();

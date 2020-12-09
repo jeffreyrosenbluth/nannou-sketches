@@ -3,8 +3,7 @@ use nannou::prelude::*;
 const CAPACITY: usize = 64;
 
 pub fn blq(bl: Point2, tr: Point2) -> (Point2, Point2) {
-    let mid = (bl + tr) / 2.0;
-    (bl, mid)
+    (bl, (bl + tr) / 2.0)
 }
 
 pub fn brq(bl: Point2, tr: Point2) -> (Point2, Point2) {
@@ -22,8 +21,7 @@ pub fn tlq(bl: Point2, tr: Point2) -> (Point2, Point2) {
 }
 
 pub fn trq(bl: Point2, tr: Point2) -> (Point2, Point2) {
-    let mid = (bl + tr) / 2.0;
-    (mid, tr)
+    ((bl + tr) / 2.0, tr)
 }
 
 pub trait Position {
@@ -62,14 +60,14 @@ pub enum QNode<T> {
 
 impl<T: Position + Clone> QNode<T> {
     pub fn split(&mut self, bl: Point2, tr: Point2) {
-        let midx = (bl.x + tr.x) / 2.0;
-        let midy = (bl.y + tr.y) / 2.0;
         let mut bl_quad = vec![];
         let mut br_quad = vec![];
         let mut tl_quad = vec![];
         let mut tr_quad = vec![];
         match self {
             QNode::Points(ps) => {
+                let midx = (bl.x + tr.x) / 2.0;
+                let midy = (bl.y + tr.y) / 2.0;
                 for p in ps {
                     if p.pos().x <= midx {
                         if p.pos().y <= midy {
@@ -99,8 +97,6 @@ impl<T: Position + Clone> QNode<T> {
 
     pub fn insert(&mut self, p: T, bl: Point2, tr: Point2) {
         let midx = (bl.x + tr.x) / 2.0;
-        let midy = (bl.y + tr.y) / 2.0;
-        let mid = pt2(midx, midy);
         match self {
             QNode::Points(pts) => {
                 pts.push(p);
@@ -109,6 +105,8 @@ impl<T: Position + Clone> QNode<T> {
                 }
             }
             QNode::Quad(q) if p.pos().x <= midx => {
+                let midy = (bl.y + tr.y) / 2.0;
+                let mid = pt2(midx, midy);
                 if p.pos().y <= midy {
                     q.bl.insert(p, bl, mid);
                 } else {
@@ -116,6 +114,8 @@ impl<T: Position + Clone> QNode<T> {
                 }
             }
             QNode::Quad(q) => {
+                let midy = (bl.y + tr.y) / 2.0;
+                let mid = pt2(midx, midy);
                 if p.pos().y <= midy {
                     q.br.insert(p, pt2(midx, bl.y), pt2(tr.x, midy));
                 } else {

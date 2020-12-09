@@ -1,8 +1,8 @@
-use nannou::prelude::*;
+use nannou::color::white_point::D65;
+use nannou::color::{Alpha, IntoLinSrgba, Lab, Laba};
 use nannou::ease::cubic::ease_in_out;
 use nannou::math::{Basis2, Rad};
-use nannou::color::white_point::D65;
-use nannou::color::{Alpha, Lab, Laba, IntoLinSrgba};
+use nannou::prelude::*;
 
 pub mod quadtree;
 
@@ -48,8 +48,9 @@ pub fn rotate_pt(p: Point2<f32>, turn: f32) -> Point2<f32> {
 }
 
 pub fn circle_mask<T>(draw: &Draw, width: f32, height: f32, radius: f32, color: T)
-where T: IntoLinSrgba<f32>
- {
+where
+    T: IntoLinSrgba<f32>,
+{
     use nannou::geom::path::Builder;
     let mut builder = Builder::new();
     let w2 = width / 2.;
@@ -59,14 +60,11 @@ where T: IntoLinSrgba<f32>
     builder = builder.line_to(pt2(w2, -h2));
     builder = builder.line_to(pt2(-w2, -h2));
     builder = builder.move_to(pt2(0., -radius));
-    builder = builder.arc(pt2(0.,0.), vec2(radius, radius), TAU, 0.);
+    builder = builder.arc(pt2(0., 0.), vec2(radius, radius), TAU, 0.);
     builder = builder.close();
-    
+
     let p = builder.build();
 
     // draw arc
-    draw.path()
-        .fill()
-        .color(color)
-        .events(p.iter());
+    draw.path().fill().color(color).events(p.iter());
 }

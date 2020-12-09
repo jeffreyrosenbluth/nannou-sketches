@@ -8,7 +8,7 @@ fn main() {
     nannou::app(model).update(update).run();
 }
 
-const MAXFORCE: f32 = 0.05;
+const MAXFORCE: f32 = 0.06;
 const MAXSPEED: f32 = 2.5;
 
 struct Model {
@@ -24,6 +24,7 @@ struct Model {
     coh_radius: f32,
     grid: bool,
 }
+
 widget_ids! {
     struct Ids {
         sep_strength,
@@ -40,7 +41,7 @@ widget_ids! {
 
 #[derive(Clone, PartialEq)]
 struct Boid {
-    position: Vector2,
+    position: Point2,
     velocity: Vector2,
     acceleration: Vector2,
     r: f32,
@@ -70,62 +71,61 @@ impl Boid {
         }
     }
 
-    fn tally(
+    fn accumualte(
         &self,
         boids: &Vec<Boid>,
         acc: impl Fn(&Boid) -> Vector2,
-        steer: impl Fn(Vector2, i32) -> Vector2,
+        steer: impl Fn(Vector2, f32) -> Vector2,
     ) -> Vector2 {
-        let mut sum = vec2(0., 0.);
-        let mut count = 0;
+        let mut sum = vec2(0.0, 0.0);
+        let mut count = 0.0;
         for b in boids {
             if b != self {
                 sum += acc(b);
-                count += 1;
+                count += 1.0;
             }
         }
-        if count > 0 {
+        if count > 0.0 {
             return steer(sum, count);
-        } else {
-            return vec2(0., 0.);
         }
+        vec2(0.0, 0.0)
     }
 
     fn align(&self, boids: &Vec<Boid>) -> Vector2 {
-        let steer = |s: Vector2, c: i32| {
-            ((s / c as f32).with_magnitude(MAXSPEED) - self.velocity).limit_magnitude(MAXFORCE)
+        let steer = |s: Vector2, c: f32| {
+            ((s / c).with_magnitude(MAXSPEED) - self.velocity).limit_magnitude(MAXFORCE)
         };
-        self.tally(boids, &|b: &Boid| b.velocity, &steer)
+        self.accumualte(boids, &|b: &Boid| b.velocity, &steer)
     }
 
     fn separate(&self, boids: &Vec<Boid>, dist: f32) -> Vector2 {
         let acc = |b: &Boid| (self.position - b.position).with_magnitude(1. / dist);
-        let steer = |s: Vector2, _c: i32| {
+        let steer = |s: Vector2, _c: f32| {
             if s.magnitude() > 0. {
                 return (s.with_magnitude(MAXSPEED) - self.velocity).limit_magnitude(MAXFORCE);
             } else {
                 return vec2(0., 0.);
             }
         };
-        self.tally(boids, &acc, &steer)
+        self.accumualte(boids, &acc, &steer)
     }
 
     fn cohesion(&self, boids: &Vec<Boid>) -> Vector2 {
-        let steer = |s: Vector2, c: i32| self.seek(s / c as f32);
-        self.tally(boids, &|b: &Boid| b.position, &steer)
+        let steer = |s: Vector2, c: f32| self.seek(s / c);
+        self.accumualte(boids, &|b: &Boid| b.position, &steer)
     }
 
     fn update(&mut self) {
         self.velocity += self.acceleration;
         self.velocity.limit_magnitude(MAXSPEED);
         self.position += self.velocity;
-        self.acceleration *= 0.;
+        self.acceleration = vec2(0.0, 0.0);
     }
 
     fn seek(&self, target: Vector2) -> Vector2 {
         let desired = target - self.position;
-        let des = desired.with_magnitude(MAXSPEED);
-        let steer = des - self.velocity;
+        let desired = desired.with_magnitude(MAXSPEED);
+        let steer = desired - self.velocity;
         steer.limit_magnitude(MAXFORCE)
     }
 
@@ -156,6 +156,7 @@ fn model(app: &App) -> Model {
     let ids = Ids::new(ui.widget_id_generator());
     let bl = app.window_rect().bottom_left();
     let tr = app.window_rect().top_right();
+
     let mut boids = Vec::new();
     for _ in 0..BOID_COUNT {
         let x = random_range(bl.x, tr.x);
@@ -170,7 +171,7 @@ fn model(app: &App) -> Model {
     let ali_radius = 75.0;
     let coh_strength = 1.0;
     let coh_radius = 100.0;
-    let grid = false;
+    let grid = true;
     Model {
         boids,
         qtree,
@@ -193,10 +194,10 @@ fn update(app: &App, m: &mut Model, _update: Update) {
         widget::Slider::new(val, min, max)
             .w_h(150.0, 24.0)
             .label_font_size(12)
-            .rgb(75. / 255., 136. / 255., 162. / 255.)
-            .label_rgb(211. / 255., 212. / 255., 217. / 255.)
+            .rgb(0.29, 0.53, 0.64)
+            .label_rgb(0.83, 0.83, 0.85)
             .border(0.5)
-            .border_rgb(37. / 255., 38. / 255., 39. / 255.)
+            .border_rgb(37. / 255., 0.15, 0.15)
     }
 
     let sep_label = format!("Separation Strength: {:.1}", m.sep_strength);
@@ -258,8 +259,8 @@ fn update(app: &App, m: &mut Model, _update: Update) {
         .w_h(150.0, 30.0)
         .label("Reset")
         .label_font_size(12)
-        .rgb(37. / 255., 38. / 255., 39. / 255.)
-        .label_rgb(211. / 255., 212. / 255., 217. / 255.)
+        .rgb(0.15, 0.15, 0.15)
+        .label_rgb(0.83, 0.83, 0.85)
         .border(0.0)
         .set(m.ids.reset, ui)
     {
@@ -271,13 +272,14 @@ fn update(app: &App, m: &mut Model, _update: Update) {
         m.coh_radius = 100.0;
     }
 
+    let grid_label = if m.grid { "Grid Off" } else { "Grid On" };
     for _click in widget::Button::new()
         .down(10.0)
         .w_h(150.0, 30.0)
-        .label("Toggle Grid")
+        .label(grid_label)
         .label_font_size(12)
-        .rgb(37. / 255., 38. / 255., 39. / 255.)
-        .label_rgb(211. / 255., 212. / 255., 217. / 255.)
+        .rgb(0.15, 0.15, 0.15)
+        .label_rgb(0.83, 0.83, 0.85)
         .border(0.0)
         .set(m.ids.grid, ui)
     {
@@ -289,8 +291,8 @@ fn update(app: &App, m: &mut Model, _update: Update) {
         .bottom_left_with_margin(20.0)
         .w_h(150.0, 30.0)
         .font_size(12)
-        .text_color(color::Color::Rgba(211./255., 212./255., 217./255., 1.))
-        .rgb(0. / 255., 0. / 255., 0. / 255.)
+        .text_color(color::Color::Rgba(0.83, 0.83, 0.85, 1.0))
+        .rgb(0.0, 0.0, 0.0)
         .set(m.ids.fps, ui);
 
     let bl = app.window_rect().bottom_left();

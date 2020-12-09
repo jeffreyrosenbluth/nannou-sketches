@@ -80,8 +80,8 @@ fn random_ball() -> Ball {
     let circle: bool = random();
     match circle {
         true => ball.b = ball.a,
-        false => ball.b = random_range(20.0, 100.0)
-    } 
+        false => ball.b = random_range(20.0, 100.0),
+    }
     ball
 }
 

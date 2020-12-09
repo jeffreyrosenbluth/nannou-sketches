@@ -113,7 +113,6 @@ fn view(app: &App, m: &Model, frame: Frame) {
     // }
 }
 
-
 pub fn captured_frame_path(app: &App, frame: &Frame) -> std::path::PathBuf {
     // Create a path that we want to save this frame to.
     app.project_path()

@@ -56,7 +56,12 @@ where
     let angles = angles.map(|x| x + angle);
     let pts = angles.map(|a| rotate_pt(pt2(0., 200.), a));
     for p in pts {
-        draw.ellipse().color(c).w_h(s, s).xy(p).stroke_weight(2.).stroke(WHITE);
+        draw.ellipse()
+            .color(c)
+            .w_h(s, s)
+            .xy(p)
+            .stroke_weight(2.)
+            .stroke(WHITE);
     }
 }
 
