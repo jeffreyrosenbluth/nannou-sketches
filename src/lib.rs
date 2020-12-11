@@ -4,8 +4,6 @@ use nannou::ease::cubic::ease_in_out;
 use nannou::math::{Basis2, Rad};
 use nannou::prelude::*;
 
-pub mod quadtree;
-
 pub fn captured_frame_path(app: &App, frame: &Frame) -> std::path::PathBuf {
     // Create a path that we want to save this frame to.
     app.project_path()

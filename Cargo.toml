@@ -14,9 +14,6 @@ primes = "0.3"
 name = "dolphin"
 path = "examples/dolphin.rs"
 [[example]]
-name = "boids"
-path = "examples/boids.rs"
-[[example]]
 name = "kaleidoscope"
 path = "examples/kaleidoscope.rs"
 [[example]]
