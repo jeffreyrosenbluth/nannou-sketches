@@ -3,19 +3,10 @@ use nannou::prelude::*;
 use sketches::captured_frame_path;
 
 fn main() {
-    nannou::app(model).run()
+    nannou::sketch(view).run()
 }
 
-// fn update(app: &App, m: &mut Model, _update: Update) {}
-
-struct Model {}
-
-fn model(app: &App) -> Model {
-    app.new_window().size(600, 600).view(view).build().unwrap();
-    Model {}
-}
-
-fn view(app: &App, _m: &Model, frame: Frame) {
+fn view(app: &App, frame: Frame) {
     let draw = app.draw();
     let rect = app.window_rect();
     let nn = nannou::noise::OpenSimplex::new();
