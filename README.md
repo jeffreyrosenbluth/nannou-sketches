@@ -75,7 +75,7 @@ Uses OpenSimplex noise and creates a noise loop.
 
 # HexO
 
-![HexO](https://github.com/jeffreyrosenbluth/nannou-sketches/raw/master/hex/hexo.JPG)
+![hEXo](HTTPS://GITHUB.COM/JEFFREYROSENBLUTH/NANNOU-SKETCHES/RAW/MASTER/IMG/HEXO.jpg)
 
 
 ***
