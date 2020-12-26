@@ -9,28 +9,3 @@ edition = "2018"
 [dependencies]
 nannou = "0.15"
 primes = "0.3"
-
-[[example]]
-name = "dolphin"
-path = "examples/dolphin.rs"
-[[example]]
-name = "kaleidoscope"
-path = "examples/kaleidoscope.rs"
-[[example]]
-name = "worms"
-path = "examples/worms.rs"
-[[example]]
-name = "hilbert"
-path = "examples/hilbert.rs"
-[[example]]
-name = "squares"
-path = "examples/squares.rs"
-[[example]]
-name = "pendulum"
-path = "examples/pendulum.rs"
-[[example]]
-name = "rings"
-path = "examples/rings.rs"
-[[example]]
-name = "reveal"
-path = "examples/reveal.rs"
