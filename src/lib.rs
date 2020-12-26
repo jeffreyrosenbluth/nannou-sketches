@@ -8,11 +8,8 @@ pub fn captured_frame_path(app: &App, frame: &Frame) -> std::path::PathBuf {
     // Create a path that we want to save this frame to.
     app.project_path()
         .expect("failed to locate `project_path`")
-        // Capture all frames to a directory called `/<path_to_nannou>/nannou/simple_capture`.
-        .join(app.exe_name().unwrap())
-        // Name each file after the number of the frame.
-        .join(format!("image_{:03}", frame.nth()))
-        // The extension will be PNG. We also support tiff, bmp, gif, jpeg, webp and some others.
+        .join("img")
+        .join(format!("{}_{:03}", app.exe_name().unwrap(), frame.nth()))
         .with_extension("png")
 }
 
