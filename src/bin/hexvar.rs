@@ -45,10 +45,10 @@ fn view(app: &App, frame: Frame) {
             let d = d.rotate(angle);
             d.line()
                 .points(pt2(0.0, -h), pt2(0.0, h))
-                .color(WHITE)
-                .stroke_weight(2.0);
-            arc(&d, 300.0, 120.0, SIZE / 2.0, WHITE, 2.0).x_y(-SIZE, 0.0);
-            arc(&d, 120.0, 120.0, SIZE / 2.0, WHITE, 2.0).x_y(SIZE, 0.0);
+                .color(GRAY)
+                .stroke_weight(5.0);
+            arc(&d, 300.0, 120.0, SIZE / 2.0, GRAY, 5.0).x_y(-SIZE, 0.0);
+            arc(&d, 120.0, 120.0, SIZE / 2.0, GRAY, 5.0).x_y(SIZE, 0.0);
         }
     }
     if png {
