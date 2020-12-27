@@ -1,5 +1,8 @@
-use nannou::prelude::*;
+use getopts::Options;
 use nannou::app::LoopMode;
+use nannou::prelude::*;
+use std::env;
+
 use sketches::{arc, captured_frame_path};
 
 const SIZE: f32 = 25.0;
@@ -7,11 +10,24 @@ const WIDTH: f32 = 900.0;
 const HEIGHT: f32 = 900.0;
 
 fn main() {
-    nannou::sketch(view).size(WIDTH as u32, HEIGHT as u32).run()
+    nannou::sketch(view)
+        .size(WIDTH as u32, HEIGHT as u32)
+        .run()
 }
 
 fn view(app: &App, frame: Frame) {
+    let args: Vec<String> = env::args().collect();
+
+    let mut opts = Options::new();
+    opts.optflag("p", "png", "save frames to file as png.");
+    let matches = match opts.parse(&args[1..]) {
+        Ok(m) => m,
+        Err(f) => panic!(f.to_string()),
+    };
+    let png = matches.opt_present("p");
+
     app.set_loop_mode(LoopMode::loop_once());
+
     let h = (PI / 3.0).sin() * SIZE;
     let width2 = WIDTH / 2.0;
     let height2 = HEIGHT / 2.0;
@@ -35,8 +51,9 @@ fn view(app: &App, frame: Frame) {
             arc(&d, 120.0, 120.0, SIZE / 2.0, WHITE, 2.0).x_y(SIZE, 0.0);
         }
     }
-    let file_path = captured_frame_path(app, &frame);
-    app.main_window().capture_frame(file_path);
+    if png {
+        let file_path = captured_frame_path(app, &frame);
+        app.main_window().capture_frame(file_path);
+    }
     draw.to_frame(app, &frame).unwrap();
 }
-
