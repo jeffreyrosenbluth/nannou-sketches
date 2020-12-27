@@ -59,7 +59,6 @@ fn update(_app: &App, m: &mut Model, _update: Update) {
 
 fn view(app: &App, m: &Model, frame: Frame) {
     let draw = app.draw();
-    // let win = app.window_rect();
     let k = pow(2, 9) as f32;
     if frame.nth() == 0 {
         frame.clear(BLACK);
@@ -71,7 +70,7 @@ fn view(app: &App, m: &Model, frame: Frame) {
         let p2 = m.points[m.count];
         let r = Range::new(m.scale as f32, 3. * m.scale as f32);
         draw.line()
-            .weight(6.0)
+            .weight(2.0)
             .caps_round()
             .color(ORANGE)
             .x_y(-k / 2., -k / 2.)

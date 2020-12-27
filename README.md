@@ -84,6 +84,8 @@ Uses OpenSimplex noise and creates a noise loop.
 
 ![HexVar](https://github.com/jeffreyrosenbluth/nannou-sketches/raw/master/img/hexvar.png)
 
+Based on "Hex Variation" by William Kolmyjec Originally published in "Computer Graphics and Art" vol3 no4, 1978 
+
 [[source code]](https://github.com/jeffreyrosenbluth/nannou-sketches/blob/master/bin/hexvar.rs)
 
 ***
