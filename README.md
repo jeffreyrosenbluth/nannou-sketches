@@ -89,3 +89,12 @@ Based on "Hex Variation" by William Kolmyjec Originally published in "Computer G
 [[source code]](https://github.com/jeffreyrosenbluth/nannou-sketches/blob/master/bin/hexvar.rs)
 
 ***
+# Sunflower
+
+![SunFlower](https://github.com/jeffreyrosenbluth/nannou-sketches/raw/master/img/sunflower.png)
+
+A representation of Vogel’s model for the floret pattern of a sunflower head. Vogel, H (1979). “A better way to construct the sunflower head”. Mathematical Biosciences 44 (44): 179–189. doi:10.1016/0025-5564(79)90080-4.
+
+[[source code]](https://github.com/jeffreyrosenbluth/nannou-sketches/blob/master/bin/sunflower.rs)
+
+***

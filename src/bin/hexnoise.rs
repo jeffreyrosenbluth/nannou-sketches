@@ -1,4 +1,5 @@
 use getopts::Options;
+use nannou::app::LoopMode;
 use nannou::prelude::*;
 use std::env;
 
@@ -26,14 +27,12 @@ fn model(app: &App) -> Model {
     let h = (PI / 3.0).sin() * SIZE;
     let m = (WIDTH / (SIZE * 3.0)) as usize;
     let n = (HEIGHT / h) as usize + 1;
-    let mut angles = vec![vec![0.0; n+1]; m+1];
+    let mut angles = vec![vec![0.0; n + 1]; m + 1];
     for i in 0..=m {
         for j in 0..=n {
             angles[i][j] = random_range(0, 3) as f32 * PI / 3.0;
         }
     }
-
-    dbg!(angles.len());
 
     Model {
         line_width: 25.0,
@@ -42,7 +41,7 @@ fn model(app: &App) -> Model {
 }
 
 fn update(_app: &App, model: &mut Model, _update: Update) {
-    if model.line_width > 2.0 {
+    if model.line_width > 4.0 {
         model.line_width -= 0.05;
     }
 }
@@ -76,10 +75,9 @@ fn view(app: &App, model: &Model, frame: Frame) {
                 x += SIZE * 1.5;
             }
             let angle = model.angles[i][j];
-            // let angle = random_range(0, 3) as f32 * PI / 3.0;
             let d = draw.translate(vec3(x, y, 0.0));
             let d = d.rotate(angle);
-            let c = if model.line_width > 2.05 { GRAY } else { WHITE };
+            let c = GRAY;
             d.line()
                 .points(pt2(0.0, -h), pt2(0.0, h))
                 .color(c)
@@ -92,5 +90,11 @@ fn view(app: &App, model: &Model, frame: Frame) {
         let file_path = captured_frame_path(app, &frame);
         app.main_window().capture_frame(file_path);
     }
+
+    // Turn off loop when done to save cpu cycles.
+    if model.line_width < 4.1 {
+        app.set_loop_mode(LoopMode::loop_once());
+    }
+
     draw.to_frame(app, &frame).unwrap();
 }

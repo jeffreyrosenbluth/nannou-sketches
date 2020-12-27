@@ -5,7 +5,6 @@ use nannou::math::{Basis2, Rad};
 use nannou::prelude::*;
 
 pub fn captured_frame_path(app: &App, frame: &Frame) -> std::path::PathBuf {
-    // Create a path that we want to save this frame to.
     app.project_path()
         .expect("failed to locate `project_path`")
         .join("img")
