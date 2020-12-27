@@ -79,7 +79,7 @@ fn view(app: &App, model: &Model, frame: Frame) {
             // let angle = random_range(0, 3) as f32 * PI / 3.0;
             let d = draw.translate(vec3(x, y, 0.0));
             let d = d.rotate(angle);
-            let c = if model.line_width > 2.05 { ORANGE } else { WHITE };
+            let c = if model.line_width > 2.05 { GRAY } else { WHITE };
             d.line()
                 .points(pt2(0.0, -h), pt2(0.0, h))
                 .color(c)
