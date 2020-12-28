@@ -1,6 +1,6 @@
 use getopts::Options;
-use nannou::prelude::*;
 use nannou::noise::NoiseFn;
+use nannou::prelude::*;
 use std::env;
 
 use sketches::captured_frame_path;
@@ -42,7 +42,10 @@ fn model(app: &App) -> Model {
         let delta_y = 0.04 * WIDTH * nn.get([0.01 * x as f64, 0.01 * y as f64, 0.1]) as f32;
         path[i] = pt2(x + delta_x, y + delta_y);
     }
-    path = path.into_iter().map(|p| {p - vec2(WIDTH / 2.0, WIDTH / 2.0)}).collect();
+    path = path
+        .into_iter()
+        .map(|p| p - vec2(WIDTH / 2.0, WIDTH / 2.0))
+        .collect();
 
     Model { path, index: 1 }
 }
@@ -73,7 +76,7 @@ fn view(app: &App, model: &Model, frame: Frame) {
         .color(WHITE)
         .points(model.path[model.index - 1], model.path[model.index]);
 
-    if png && frame.nth() == pow(2, ORDER) * pow(2, ORDER) - 1   {
+    if png && frame.nth() == pow(2, ORDER) * pow(2, ORDER) - 1 {
         let file_path = captured_frame_path(app, &frame);
         app.main_window().capture_frame(file_path);
     }
@@ -94,20 +97,26 @@ fn hilbert(k: usize, order: usize) -> Point2 {
         i >>= 2;
         let index = i & 3;
         let n = pow(2, j) as f32;
-        if index == 0 {
-            let temp = v.x;
-            v.x = v.y;
-            v.y = temp;
-        } else if index == 1 {
-            v.y += n;
-        } else if index == 2 {
-            v.x += n;
-            v.y += n;
-        } else if index == 3 {
-            let temp = n - 1.0 - v.x;
-            v.x = n - 1.0 - v.y;
-            v.y = temp;
-            v.x += n;
+        match index {
+            0 => {
+                let temp = v.x;
+                v.x = v.y;
+                v.y = temp;
+            }
+            1 => {
+                v.y += n;
+            }
+            2 => {
+                v.x += n;
+                v.y += n;
+            }
+            3 => {
+                let temp = n - 1.0 - v.x;
+                v.x = n - 1.0 - v.y;
+                v.y = temp;
+                v.x += n;
+            }
+            _ => {}
         }
     }
     v
