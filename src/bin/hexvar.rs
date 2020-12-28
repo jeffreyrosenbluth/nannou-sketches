@@ -1,5 +1,4 @@
 use getopts::Options;
-use nannou::app::LoopMode;
 use nannou::prelude::*;
 use std::env;
 
