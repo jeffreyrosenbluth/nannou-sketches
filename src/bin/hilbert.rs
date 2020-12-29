@@ -67,12 +67,13 @@ fn view(app: &App, model: &Model, frame: Frame) {
     let png = matches.opt_present("p");
 
     let draw = app.draw();
-    if frame.nth() == 0 {
+    if frame.nth() == 0  {
         frame.clear(BLACK);
     }
+
     draw.line()
         .weight(2.0)
-        // .caps_butt()
+        .caps_round()
         .color(WHITE)
         .points(model.path[model.index - 1], model.path[model.index]);
 
