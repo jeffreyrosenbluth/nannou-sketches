@@ -57,7 +57,6 @@ fn model(app: &App) -> Model {
         dst_format,
     );
 
-    // Make sure the directory where we will save images to exists.
     std::fs::create_dir_all(&capture_directory(app)).unwrap();
 
     Model {
@@ -70,11 +69,9 @@ fn model(app: &App) -> Model {
 }
 
 fn update(app: &App, model: &mut Model, _update: Update) {
-    // Use the frame number to animate, ensuring we get a constant update time.
     let elapsed_frames = app.main_window().elapsed_frames();
     if elapsed_frames > 0 { return }
 
-    // First, reset the `draw` state.
     let draw = &model.draw;
     draw.reset();
 
@@ -89,7 +86,7 @@ fn update(app: &App, model: &mut Model, _update: Update) {
 
     let width = w as f32 * 0.8;
     let k1 = 0.0025;
-    let k2 = 0.09;
+    let k2 = 0.04;
 
     for i in 0..total {
         path.push(hilbert(i, ORDER));
