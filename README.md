@@ -100,7 +100,7 @@ A representation of Vogel’s model for the floret pattern of a sunflower head. 
 ***
 # Hilbert Swerve
 
-![Hilbert Swerve](https://github.com/jeffreyrosenbluth/nannou-sketches/raw/master/img/hilbert.png)
+![Hilbert Swerve](https://github.com/jeffreyrosenbluth/nannou-sketches/raw/master/img/hilbert_6.png)
 
 Hilbert's famous space filling curve twisted with some simplx noise.
 
