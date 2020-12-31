@@ -1,8 +1,11 @@
-use nannou::{color::white_point::D65, draw::{Drawing, primitive::Path}};
 use nannou::color::{Alpha, IntoLinSrgba, Lab, Laba};
 use nannou::ease::cubic::ease_in_out;
 use nannou::math::{Basis2, Rad};
 use nannou::prelude::*;
+use nannou::{
+    color::white_point::D65,
+    draw::{primitive::Path, Drawing},
+};
 
 pub fn captured_frame_path(app: &App, frame: &Frame) -> std::path::PathBuf {
     app.project_path()
@@ -63,20 +66,38 @@ where
     draw.path().fill().color(color).events(p.iter());
 }
 
-pub fn arc<C> (
+pub fn arc<C>(
     draw: &Draw,
     start_deg: f32,
     angle_deg: f32,
     radius: f32,
     color: C,
-    weight: f32
-) -> Drawing< Path<f32>, f32> where C: IntoLinSrgba<f32> {
-// ) -> DrawingPath {
+    weight: f32,
+) -> Drawing<Path<f32>, f32>
+where
+    C: IntoLinSrgba<f32>,
+{
+    // ) -> DrawingPath {
     let start = start_deg as usize;
     let end = start + angle_deg as usize;
     let pts = (start..=end).map(|i| {
         let theta = i as f32 / 360.0 * TAU;
         pt2(radius * theta.cos(), radius * theta.sin())
     });
-    draw.polyline().join_round().color(color).weight(weight).points(pts)
+
+    draw.polyline()
+        .join_round()
+        .color(color)
+        .weight(weight)
+        .points(pts)
+}
+
+pub fn border(app: &App, draw: &Draw, width: f32) {
+    let (xy, wh) = app.window_rect().xy_wh();
+    draw.rect()
+        .xy(xy)
+        .wh(wh)
+        .color(srgba(0.0, 0.0, 0.0, 0.0))
+        .stroke(BLACK)
+        .stroke_weight(width);
 }
