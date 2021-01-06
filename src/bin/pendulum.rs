@@ -1,5 +1,5 @@
 use nannou::prelude::*;
-use sketches::captured_frame_path;
+use sketches::img_path;
 
 fn clock(frame: u64) -> f32 {
     let rate = 360;

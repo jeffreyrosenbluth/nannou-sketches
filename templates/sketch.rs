@@ -3,7 +3,7 @@ use nannou::app::LoopMode;
 use nannou::prelude::*;
 use std::env;
 
-use sketches::captured_frame_path;
+use sketches::img_path;
 
 const WIDTH: u32 = 900;
 const HEIGHT: u32 = 600;
@@ -27,7 +27,7 @@ fn view(app: &App, frame: Frame) {
     draw.background().color(PLUM);
 
     if png {
-        let file_path = captured_frame_path(app, &frame);
+        let file_path = img_path(app);
         app.main_window().capture_frame(file_path);
     }
 

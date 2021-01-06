@@ -3,7 +3,7 @@ use nannou::noise::NoiseFn;
 use nannou::prelude::*;
 use std::env;
 
-use sketches::{border, captured_frame_path};
+use sketches::{border, img_path};
 
 const WIDTH: u32 = 900;
 const HEIGHT: u32 = 600;
@@ -70,7 +70,7 @@ fn view(app: &App, model: &Model, frame: Frame) {
     border(app, &draw, 50.0);
 
     if png && (model.distortion * 100.0) as i32 == 1 {
-        let file_path = captured_frame_path(app, &frame);
+        let file_path = img_path(app);
         app.main_window().capture_frame(file_path);
     }
 

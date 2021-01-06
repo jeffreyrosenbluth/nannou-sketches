@@ -2,7 +2,7 @@ use getopts::Options;
 use nannou::prelude::*;
 use std::env;
 
-use sketches::captured_frame_path;
+use sketches::gif_path;
 
 const WIDTH: u32 = 900;
 const HEIGHT: u32 = 600;
@@ -40,7 +40,7 @@ fn view(app: &App, model: &Model, frame: Frame) {
     }
 
     if png {
-        let file_path = captured_frame_path(app, &frame);
+        let file_path = gif_path(app, &frame);
         app.main_window().capture_frame(file_path);
     }
 

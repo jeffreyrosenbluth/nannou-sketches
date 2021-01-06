@@ -7,11 +7,19 @@ use nannou::{
     draw::{primitive::Path, Drawing},
 };
 
-pub fn captured_frame_path(app: &App, frame: &Frame) -> std::path::PathBuf {
+pub fn img_path(app: &App) -> std::path::PathBuf {
     app.project_path()
         .expect("failed to locate `project_path`")
         .join("img")
-        .join(format!("{}_{:03}", app.exe_name().unwrap(), frame.nth()))
+        .join(format!("{}", app.exe_name().unwrap()))
+        .with_extension("png")
+}
+
+pub fn gif_path(app: &App, frame: &Frame) -> std::path::PathBuf {
+    app.project_path()
+        .expect("failed to locate `project_path`")
+        .join(app.exe_name().unwrap())
+        .join(format!("frame_{:03}", frame.nth()))
         .with_extension("png")
 }
 
@@ -26,6 +34,23 @@ pub fn random_color() -> Alpha<Lab<D65, f32>, f32> {
     let b: f32 = random_range(-128.0, 127.0);
     let o: f32 = random_range(0.5, 1.0);
     Laba::new(l, a, b, o)
+}
+
+pub fn random_color2() -> LinSrgba {
+    let l: f32 = random_range(0.0, 100.0);
+    let a: f32 = random_range(-128.0, 127.0);
+    let b: f32 = random_range(-128.0, 127.0);
+    Laba::new(l, a, b, 1.0).into_lin_srgba()
+}
+
+pub fn set_opacity(c: LinSrgba, o: f32) -> LinSrgba {
+    srgba(
+        c.red as f32 / 255.,
+        c.green as f32 / 255.,
+        c.blue as f32 / 255.,
+        o,
+    )
+    .into_lin_srgba()
 }
 
 pub fn with_opacity(c: nannou::color::Srgb<u8>, o: f32) -> nannou::color::rgb::Srgba {
@@ -100,4 +125,121 @@ pub fn border(app: &App, draw: &Draw, width: f32) {
         .color(srgba(0.0, 0.0, 0.0, 0.0))
         .stroke(BLACK)
         .stroke_weight(width);
+}
+
+pub struct Grid<T> {
+    pub width: f32,
+    pub height: f32,
+    pub spacing: f32,
+    pub grid: Vec<T>,
+    pub pts: Vec<Point2>,
+}
+
+impl<T> Grid<T>
+where
+    T: Copy,
+{
+    pub fn new(width: f32, height: f32, spacing: f32, gen: impl Fn(f32, f32) -> T) -> Self {
+        let rows = (height / spacing) as usize;
+        let cols = (width / spacing) as usize;
+        let mut grid = vec![];
+        let mut pts = vec![];
+        for i in 0..rows {
+            let y = -height / 2.0 + i as f32 * spacing;
+            for j in 0..cols {
+                let x = -width / 2.0 + j as f32 * spacing;
+                grid.push(gen(x, y));
+                pts.push(pt2(x, y));
+            }
+        }
+        Self {
+            width,
+            height,
+            spacing,
+            grid,
+            pts,
+        }
+    }
+
+    pub fn rows(&self) -> usize {
+        (self.height / self.spacing) as usize
+    }
+
+    pub fn cols(&self) -> usize {
+        (self.width / self.spacing) as usize
+    }
+
+    pub fn get(&self, x: f32, y: f32) -> T {
+        let col = ((x + self.width / 2.0) / self.spacing) as usize;
+        let row = ((y + self.height / 2.0) / self.spacing) as usize;
+        self.grid[row * self.cols() + col]
+    }
+
+    pub fn iter<'a>(&'a self) -> GridIter<'a, T> {
+        GridIter {
+            grid: self,
+            i: 0,
+            j: 0,
+        }
+    }
+    
+    pub fn x_bounds(&self) -> (f32, f32) {
+        (-self.width / 2.0, self.width / 2.0)
+    }
+
+    pub fn y_bounds(&self) -> (f32, f32) {
+        (-self.height / 2.0, self.height / 2.0)
+    }
+}
+
+pub struct GridIter<'a, T>
+where
+    T: Copy,
+{
+    grid: &'a Grid<T>,
+    i: usize,
+    j: usize,
+}
+
+impl<'a, T> Iterator for GridIter<'a, T>
+where
+    T: Copy,
+{
+    type Item = (Point2, T);
+
+    fn next(&mut self) -> Option<Self::Item> {
+        let n = (self.grid.width / self.grid.spacing) as usize;
+        if self.i * n + self.j >= self.grid.grid.len() {
+            return None;
+        };
+        let x = -self.grid.width / 2.0 + self.j as f32 * self.grid.spacing;
+        let y = -self.grid.height / 2.0 + self.i as f32 * self.grid.spacing;
+        let result = (pt2(x, y), self.grid.grid[self.i * n + self.j]);
+
+        if self.j >= n - 1 {
+            self.j = 0;
+            self.i += 1;
+        } else {
+            self.j += 1;
+        };
+
+        Some(result)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn get_test() {
+        let grid = Grid::new(200.0, 100.0, 10.0, |x, y| (x, y));
+        assert_eq!(grid.get(0.0, 0.0), (0.0, 0.0));
+        assert_eq!(grid.get(15.0, 25.0), (10.0, 20.0));
+        assert_eq!(grid.get(-25.0, 25.0), (-30.0, 20.0));
+        assert_eq!(grid.get(29.0, -29.0), (20.0, -30.0));
+        assert_eq!(grid.get(-80.0, -29.0), (-80.0, -30.0));
+        assert_eq!(grid.get(-100.0, -50.0), (-100.0, -50.0));
+        assert_eq!(grid.get(99.0, 49.0), (90.0, 40.0));
+    }
 }

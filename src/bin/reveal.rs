@@ -1,6 +1,6 @@
 use nannou::geom::path::Builder;
 use nannou::prelude::*;
-use sketches::{captured_frame_path, with_opacity};
+use sketches::{img_path, with_opacity};
 
 fn main() {
     nannou::app(model).update(update).run();

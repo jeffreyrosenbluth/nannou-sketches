@@ -1,7 +1,7 @@
 use nannou::color::IntoLinSrgba;
 use nannou::math::{Basis2, Rad};
 use nannou::prelude::*;
-use sketches::captured_frame_path;
+use sketches::img_path;
 
 fn main() {
     nannou::app(model).update(update).run()

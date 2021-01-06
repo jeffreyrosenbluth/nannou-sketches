@@ -1,7 +1,7 @@
 use nannou::noise::NoiseFn;
 use nannou::prelude::*;
 use primes::is_prime;
-use sketches::captured_frame_path;
+use sketches::img_path;
 use sketches::with_opacity;
 
 const H: f32 = 900.0;

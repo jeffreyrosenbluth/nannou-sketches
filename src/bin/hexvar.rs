@@ -2,7 +2,7 @@ use getopts::Options;
 use nannou::prelude::*;
 use std::env;
 
-use sketches::{arc, captured_frame_path};
+use sketches::{arc, img_path};
 
 const SIZE: f32 = 25.0;
 const WIDTH: f32 = 900.0;
@@ -51,7 +51,7 @@ fn view(app: &App, frame: Frame) {
         }
     }
     if png {
-        let file_path = captured_frame_path(app, &frame);
+        let file_path = img_path(app);
         app.main_window().capture_frame(file_path);
     }
     draw.to_frame(app, &frame).unwrap();

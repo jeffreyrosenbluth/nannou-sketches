@@ -3,7 +3,7 @@ use nannou::noise::NoiseFn;
 use nannou::prelude::*;
 use std::env;
 
-use sketches::captured_frame_path;
+use sketches::img_path;
 
 const WIDTH: f32 = 700.0;
 
@@ -78,7 +78,7 @@ fn view(app: &App, model: &Model, frame: Frame) {
         .points(model.path[model.index - 1], model.path[model.index]);
 
     if png && frame.nth() == pow(2, ORDER) * pow(2, ORDER) - 1 {
-        let file_path = captured_frame_path(app, &frame);
+        let file_path = img_path(app);
         app.main_window().capture_frame(file_path);
     }
 

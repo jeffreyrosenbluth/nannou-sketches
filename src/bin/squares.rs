@@ -3,7 +3,7 @@
 
 use nannou::ease::cubic::ease_in_out;
 use nannou::prelude::*;
-use sketches::captured_frame_path;
+use sketches::img_path;
 
 fn main() {
     nannou::app(model).update(update).run()

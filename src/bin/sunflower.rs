@@ -2,7 +2,7 @@ use getopts::Options;
 use nannou::prelude::*;
 use std::env;
 
-use sketches::captured_frame_path;
+use sketches::img_path;
 
 const WIDTH: u32 = 700;
 const HEIGHT: u32 = 700;
@@ -68,7 +68,7 @@ fn view(app: &App, model: &Model, frame: Frame) {
         .color(srgba(0.0, 0.0, 0.0, 0.001));
 
     if png && model.loc == POINTS {
-        let file_path = captured_frame_path(app, &frame);
+        let file_path = img_path(app);
         app.main_window().capture_frame(file_path);
     }
     if model.loc >= POINTS {

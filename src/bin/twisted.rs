@@ -1,6 +1,6 @@
 use nannou::noise::NoiseFn;
 use nannou::prelude::*;
-use sketches::captured_frame_path;
+use sketches::img_path;
 
 fn main() {
     nannou::sketch(view).run();
@@ -38,7 +38,7 @@ fn view(app: &App, frame: Frame) {
             draw.rect()
                 .wh(app.window_rect().wh())
                 .color(srgba(0.0, 0.0, 0.0, 0.75));
-            let file_path = captured_frame_path(app, &frame);
+            let file_path = img_path(app);
             app.main_window().capture_frame(file_path);
         }
     }

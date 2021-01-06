@@ -1,6 +1,6 @@
 use nannou::noise::NoiseFn;
 use nannou::prelude::*;
-use sketches::captured_frame_path;
+use sketches::img_path;
 
 fn main() {
     nannou::sketch(view).run()
