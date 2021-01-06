@@ -27,7 +27,7 @@ fn view(app: &App, frame: Frame) {
     let draw = app.draw();
     draw.background().color(BLACK);
 
-    let grid = Grid::new(WIDTH, HEIGHT, GRID_SPACING, |x, y| x / HEIGHT * PI);
+    let grid = Grid::new(2.0 * WIDTH, 2.0 * HEIGHT, GRID_SPACING, |x, _| x / HEIGHT * PI);
 
     for (p, v) in grid.iter() {
         let x = p.x + 10.0 * v.cos();
