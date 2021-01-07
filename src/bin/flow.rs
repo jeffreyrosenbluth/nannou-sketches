@@ -4,12 +4,11 @@ use nannou::noise::NoiseFn;
 use nannou::prelude::*;
 use std::env;
 
-use sketches::{img_path, random_color2, Grid};
+use sketches::{img_path, random_rgb, Grid};
 
 const WIDTH: f32 = 1200.0;
 const HEIGHT: f32 = 900.0;
-const GRID_SPACING: f32 = 5.0;
-const WEIGHT: f32 = 3.0;
+const GRID_SPACING: f32 = 50.0;
 const LENGTH: usize = 1000;
 const K: f64 = 0.002;
 const LINES: usize = 50;
@@ -38,9 +37,6 @@ fn view(app: &App, frame: Frame) {
          TAU * nn.get([K * x as f64, K * y as f64]) as f32
     });
 
-    let (xl, xr) = grid.x_bounds();
-    let (yb, yt) = grid.y_bounds();
-
     for _ in 0..LINES {
         let mut loc = pt2(
             random_range(-WIDTH / 2.0, WIDTH / 2.0),
@@ -49,17 +45,13 @@ fn view(app: &App, frame: Frame) {
         let mut points = vec![];
         for _i in 0..LENGTH {
             points.push(loc);
-            if loc.x <= xl || loc.x >= xr || loc.y <= yb || loc.y >= yt { break }; 
             let angle = &grid.get(loc.x, loc.y);
             loc.x += angle.cos();
             loc.y += angle.sin();
         }
         draw.polygon()
-            // .weight(WEIGHT)
-            // .end_cap_round()
-            // .start_cap_round()
             .points(points)
-            .color(random_color2());
+            .color(random_rgb());
     }
 
     if png {

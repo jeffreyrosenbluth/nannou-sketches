@@ -28,6 +28,7 @@ pub fn clock(frame: u64) -> f32 {
     ease_in_out(t, 0., 1., 1.)
 }
 
+// Use random_rgba instead.
 pub fn random_color() -> Alpha<Lab<D65, f32>, f32> {
     let l: f32 = random_range(0.0, 100.0);
     let a: f32 = random_range(-128.0, 127.0);
@@ -36,11 +37,19 @@ pub fn random_color() -> Alpha<Lab<D65, f32>, f32> {
     Laba::new(l, a, b, o)
 }
 
-pub fn random_color2() -> LinSrgba {
+pub fn random_rgb() -> LinSrgba {
     let l: f32 = random_range(0.0, 100.0);
     let a: f32 = random_range(-128.0, 127.0);
     let b: f32 = random_range(-128.0, 127.0);
     Laba::new(l, a, b, 1.0).into_lin_srgba()
+}
+
+pub fn random_rgba() -> LinSrgba {
+    let l: f32 = random_range(0.0, 100.0);
+    let a: f32 = random_range(-128.0, 127.0);
+    let b: f32 = random_range(-128.0, 127.0);
+    let o: f32 = random_range(0.5, 1.0);
+    Laba::new(l, a, b, o).into_lin_srgba()
 }
 
 pub fn set_opacity(c: LinSrgba, o: f32) -> LinSrgba {
@@ -53,6 +62,7 @@ pub fn set_opacity(c: LinSrgba, o: f32) -> LinSrgba {
     .into_lin_srgba()
 }
 
+// Use set_opacity instead, just around to support older sketches.
 pub fn with_opacity(c: nannou::color::Srgb<u8>, o: f32) -> nannou::color::rgb::Srgba {
     srgba(
         c.red as f32 / 255.,
@@ -170,9 +180,30 @@ where
     }
 
     pub fn get(&self, x: f32, y: f32) -> T {
-        let col = ((x + self.width / 2.0) / self.spacing) as usize;
-        let row = ((y + self.height / 2.0) / self.spacing) as usize;
-        self.grid[row * self.cols() + col]
+        let n = self.rows();
+        let m = self.cols();
+        let xn = x + self.width / 2.0;
+        let yn = y + self.height / 2.0;
+
+        let mut col = if xn < 0.0 {
+            0
+        } else {
+            ((x + self.width / 2.0) / self.spacing) as usize
+        };
+        let mut row = if yn < 0.0 {
+            0
+        } else {
+            ((y + self.height / 2.0) / self.spacing) as usize
+        };
+
+        while col >= m {
+            col -= 1;
+        }
+        while row >= n {
+            row -= 1;
+        }
+
+        self.grid[row * m + col]
     }
 
     pub fn iter<'a>(&'a self) -> GridIter<'a, T> {
@@ -182,7 +213,7 @@ where
             j: 0,
         }
     }
-    
+
     pub fn x_bounds(&self) -> (f32, f32) {
         (-self.width / 2.0, self.width / 2.0)
     }
@@ -239,7 +270,14 @@ mod tests {
         assert_eq!(grid.get(-25.0, 25.0), (-30.0, 20.0));
         assert_eq!(grid.get(29.0, -29.0), (20.0, -30.0));
         assert_eq!(grid.get(-80.0, -29.0), (-80.0, -30.0));
+    }
+
+    #[test]
+    fn get_test_bounds() {
+        let grid = Grid::new(200.0, 100.0, 10.0, |x, y| (x, y));
         assert_eq!(grid.get(-100.0, -50.0), (-100.0, -50.0));
         assert_eq!(grid.get(99.0, 49.0), (90.0, 40.0));
+        assert_eq!(grid.get(200.0, 100.0), (90.0, 40.0));
+        assert_eq!(grid.get(-200.0, -100.0), (-100.0, -50.0));
     }
 }

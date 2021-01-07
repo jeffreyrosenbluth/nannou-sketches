@@ -6,7 +6,7 @@ use nannou::color::{Alpha, white_point::D65, Lab, Laba};
 use std::env;
 use hex;
 
-use sketches::{img_path, with_opacity, random_color2,set_opacity};
+use sketches::{img_path, with_opacity, random_rgb,set_opacity};
 
 const WIDTH: u32 = 1200;
 const HEIGHT: u32 = 900;
