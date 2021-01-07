@@ -1,13 +1,18 @@
 use getopts::Options;
 use nannou::app::LoopMode;
+use nannou::noise::NoiseFn;
 use nannou::prelude::*;
 use std::env;
 
-use sketches::{img_path, Grid};
+use sketches::{img_path, random_color2, Grid};
 
 const WIDTH: f32 = 1200.0;
 const HEIGHT: f32 = 900.0;
-const GRID_SPACING: f32 = 20.0;
+const GRID_SPACING: f32 = 5.0;
+const WEIGHT: f32 = 3.0;
+const LENGTH: usize = 1000;
+const K: f64 = 0.002;
+const LINES: usize = 50;
 
 fn main() {
     nannou::sketch(view).size(WIDTH as u32, HEIGHT as u32).run()
@@ -25,27 +30,36 @@ fn view(app: &App, frame: Frame) {
 
     app.set_loop_mode(LoopMode::loop_once());
     let draw = app.draw();
-    draw.background().color(BLACK);
+    draw.background().color(CORNSILK);
 
-    let grid = Grid::new(2.0 * WIDTH, 2.0 * HEIGHT, GRID_SPACING, |x, _| x / HEIGHT * PI);
+    let nn = nannou::noise::BasicMulti::new();
 
-    for (p, v) in grid.iter() {
-        let x = p.x + 10.0 * v.cos();
-        let y = p.y + 10.0 * v.sin();
-        draw.line().points(p, pt2(x, y)).color(GREEN);
-    }
-
+    let grid = Grid::new(1.1 * WIDTH, 1.1 * HEIGHT, GRID_SPACING, |x, y| {
+         TAU * nn.get([K * x as f64, K * y as f64]) as f32
+    });
 
     let (xl, xr) = grid.x_bounds();
     let (yb, yt) = grid.y_bounds();
-    let mut loc = pt2(-WIDTH / 4.0, 0.0);
 
-    for _i in 0..400 {
-        if loc.x <= xl || loc.x >= xr || loc.y <= yb || loc.y >= yt { break }
-        draw.ellipse().xy(loc).w_h(4.0, 4.0).color(WHITE);
-        let angle = &grid.get(loc.x, loc.y);
-        loc.x += 2.0 * angle.cos();
-        loc.y += 2.0 * angle.sin();
+    for _ in 0..LINES {
+        let mut loc = pt2(
+            random_range(-WIDTH / 2.0, WIDTH / 2.0),
+            random_range(-HEIGHT / 2.0, HEIGHT / 2.0),
+        );
+        let mut points = vec![];
+        for _i in 0..LENGTH {
+            points.push(loc);
+            if loc.x <= xl || loc.x >= xr || loc.y <= yb || loc.y >= yt { break }; 
+            let angle = &grid.get(loc.x, loc.y);
+            loc.x += angle.cos();
+            loc.y += angle.sin();
+        }
+        draw.polygon()
+            // .weight(WEIGHT)
+            // .end_cap_round()
+            // .start_cap_round()
+            .points(points)
+            .color(random_color2());
     }
 
     if png {
