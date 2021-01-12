@@ -7,6 +7,8 @@ use nannou::{
     draw::{primitive::Path, Drawing},
 };
 
+// File path related functions  ------------------------------------------------
+
 pub fn img_path(app: &App) -> std::path::PathBuf {
     app.project_path()
         .expect("failed to locate `project_path`")
@@ -23,10 +25,14 @@ pub fn gif_path(app: &App, frame: &Frame) -> std::path::PathBuf {
         .with_extension("png")
 }
 
+// -----------------------------------------------------------------------------
+
 pub fn clock(frame: u64) -> f32 {
     let t = (frame % 180) as f32 / 180.;
     ease_in_out(t, 0., 1., 1.)
 }
+
+// Color functions -------------------------------------------------------------
 
 // Use random_rgba instead.
 pub fn random_color() -> Alpha<Lab<D65, f32>, f32> {
@@ -72,12 +78,16 @@ pub fn with_opacity(c: nannou::color::Srgb<u8>, o: f32) -> nannou::color::rgb::S
     )
 }
 
+// This should no longer ge necessary now that nannou had transforms for the 
+// draw function.
 pub fn rotate_pt(p: Point2<f32>, turn: f32) -> Point2<f32> {
     let rad = Rad(turns_to_rad(turn));
     let rot: Basis2<f32> = Rotation2::from_angle(rad);
     let q = rot.rotate_point(p.into());
     pt2(q.x, q.y)
 }
+
+// -----------------------------------------------------------------------------
 
 pub fn circle_mask<T>(draw: &Draw, width: f32, height: f32, radius: f32, color: T)
 where
@@ -137,6 +147,9 @@ pub fn border(app: &App, draw: &Draw, width: f32) {
         .stroke_weight(width);
 }
 
+// -----------------------------------------------------------------------------
+// Create a grid of values based on a function of it's coordinates. Used for
+// example for flow fields.
 pub struct Grid<T> {
     pub width: f32,
     pub height: f32,
@@ -256,6 +269,23 @@ where
 
         Some(result)
     }
+}
+
+pub fn gen_points(
+    f: impl Fn(f32) -> f32,
+    g: impl Fn(f32) -> f32,
+    delta: f32,
+    max: f32,
+) -> Vec<Point2> {
+    let mut points = vec![];
+    let mut t = 0.0;
+    while t <= max {
+        let x = f(t);
+        let y = g(t);
+        points.push(pt2(x, y));
+        t += delta;
+    }
+    points
 }
 
 #[cfg(test)]
