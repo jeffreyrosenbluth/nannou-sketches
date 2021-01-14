@@ -4,14 +4,14 @@ use std::{env, fmt::Display, writeln};
 
 use sketches::gif_path;
 
-const SIZE: usize = 3;
+const SIZE: usize = 4;
 const WIDTH: u32 = 900;
 const HEIGHT: u32 = 600;
 
 fn main() {
     let mut board = Board::new(SIZE);
     for _ in 0..board.size * board.size {
-        let ((r, c), _infl) = board.max_influence();
+        let ((r, c), _infl) = board.max_score();
         board = board.place(r, c);
     }
     println!("Value: {}", board.value());
@@ -169,7 +169,7 @@ impl Board {
         board
     }
 
-    fn max_influence(&self) -> ((usize, usize), i32) {
+    fn max_score(&self) -> ((usize, usize), i32) {
         let mut coords = (0, 0);
         let mut max_infl = -1;
         let board = self.influences();
@@ -178,7 +178,7 @@ impl Board {
                 if board.get(r, c).order.is_some() {
                     continue;
                 }
-                let infl = board.get(r, c).influence as i32;
+                let infl = board.get(r, c).influence as i32 + board.cell_value(r, c) as i32;
                 if infl > max_infl {
                     max_infl = infl;
                     coords = (r, c);
@@ -289,7 +289,7 @@ mod tests {
         // let board = board.place(0, 1);
         let board = board.influences();
         board.display_influence();
-        dbg!(board.max_influence());
+        dbg!(board.max_score());
         // board.get_mut(0, 0).order = Some(1);
         // board.get_mut(2, 2).order = Some(2);
         // dbg!(board.influence(0, 2));
