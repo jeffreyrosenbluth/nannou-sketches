@@ -2155,6 +2155,7 @@ dependencies = [
  "nannou",
  "primes",
  "rand 0.8.0",
+ "svg",
 ]
 
 [[package]]
@@ -2223,6 +2224,12 @@ checksum = "fd0a4829a5c591dc24a944a736d6b1e4053e51339a79fd5d4702c4c999a9c45e"
 dependencies = [
  "lock_api",
 ]
+
+[[package]]
+name = "svg"
+version = "0.8.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "be07c7154ccb4eaa86dc19f4317b134e47040335944e4b7b38d0bfc4eec06b04"
 
 [[package]]
 name = "syn"
