@@ -9,6 +9,7 @@ const HEIGHT: f32 = 700.0;
 const CIRCLES: usize = 2500;
 const VERTICES: usize = 30;
 const SCALE: f32 = 300.0;
+const WEIGHT: f32 = 2.0;
 
 fn main() {
     nannou::app(model).update(update).run();
@@ -28,7 +29,7 @@ fn model(app: &App) -> Model {
 }
 
 fn update(app: &App, model: &mut Model, _update: Update) {
-    model.time = app.elapsed_frames() as f32 / 40.0;
+    model.time = app.elapsed_frames() as f32 / 100.0;
 }
 
 fn view(app: &App, model: &Model, frame: Frame) {
@@ -60,7 +61,7 @@ fn view(app: &App, model: &Model, frame: Frame) {
         draw.polygon()
             .no_fill()
             .stroke_color(color)
-            .stroke_weight(1.0)
+            .stroke_weight(WEIGHT)
             .points(vertices);
     }
 
@@ -88,6 +89,6 @@ fn color(theta: f32, time: f32) -> nannou::color::Alpha<rgb::Rgb, f32> {
     let r = 0.6 + 0.4 * th.cos();
     let g = 0.6 + 0.4 * (th - PI / 3.0).cos();
     let b = 0.6 + 0.4 * (th - PI * 2.0 / 3.0).cos();
-    let a = map_range(CIRCLES, 100, CIRCLES, 150, 30) as f32 / 255.0;
+    let a = 0.12;
     srgba(r, g, b, a)
 }

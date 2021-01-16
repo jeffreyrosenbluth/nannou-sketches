@@ -1,3 +1,5 @@
+#![allow(dead_code)]
+
 use getopts::Options;
 use nannou::prelude::*;
 use std::{env, fmt::Display, writeln};
@@ -153,7 +155,7 @@ impl Board {
                 infl += b.value() - val;
             }
         }
-        infl as i32
+        infl as i32 + board.get(row,col).value as i32
     }
 
     fn influences(&self) -> Board {
@@ -178,7 +180,7 @@ impl Board {
                 if board.get(r, c).order.is_some() {
                     continue;
                 }
-                let infl = board.get(r, c).influence as i32 + board.cell_value(r, c) as i32;
+                let infl = board.get(r, c).influence as i32;
                 if infl > max_infl {
                     max_infl = infl;
                     coords = (r, c);
@@ -281,9 +283,8 @@ mod tests {
         // let board = Board::new(4);
         // assert_eq!(board.influence(1, 1), 19);
         // assert_eq!(board.influence(0, 0), 17);
-        let board = Board::new(3);
+        let board = Board::new(4);
         let board = board.place(1, 1);
-        let board = board.place(0, 0);
         let board = board.place(2, 2);
         // board.get_mut(1, 1).order = Some(0);
         // let board = board.place(0, 1);
