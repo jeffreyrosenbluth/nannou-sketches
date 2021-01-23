@@ -38,6 +38,7 @@ fn view(app: &App, frame: Frame) {
             .no_fill()
             .stroke(color)
             .stroke_weight(1.0)
+            // .stroke_weight(32.0)
             .x_y(i as f32 * 3.0, 0.0)
             .w_h(r, r);
     }
