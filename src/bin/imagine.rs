@@ -1,7 +1,7 @@
-use nannou::{color::IntoLinSrgba, draw::theme};
 use nannou::image;
 use nannou::image::GenericImageView;
 use nannou::prelude::*;
+use nannou::color::IntoLinSrgba;
 use sketches::img_path;
 use std::env;
 
@@ -72,96 +72,129 @@ fn view(app: &App, model: &Model, frame: Frame) {
 
     let t = height as f32 / 2.0;
     let b = -t;
-    for img_x in 0..width {
-        let x = img_x as f32 - w32 / 2.0;
-        let y = h32 / w32 * x;
-        match model.style {
-            Style::NegY => {
+    match model.style {
+        Style::NegY => {
+            for img_x in 0..width {
+                let x = img_x as f32 - w32 / 2.0;
+                let y = h32 / w32 * x;
                 let img_y = map_range(y, b, t, 0.0, h32 - 1.0) as u32;
                 let c = mk_srgb(model.image.get_pixel(img_x, img_y));
                 draw.line().color(c).points(pt2(x, -y), pt2(x, -h32 / 2.0));
             }
-            Style::NegYup => {
+        }
+        Style::NegYup => {
+            for img_x in 0..width {
+                let x = img_x as f32 - w32 / 2.0;
+                let y = h32 / w32 * x;
                 let img_y = map_range(y, b, t, 0.0, h32 - 1.0) as u32;
                 let c = mk_srgb(model.image.get_pixel(img_x, img_y));
                 draw.line().color(c).points(pt2(x, -y), pt2(x, h32 / 2.0));
             }
-            Style::NegYright => {
+        }
+        Style::NegYright => {
+            for img_x in 0..width {
+                let x = img_x as f32 - w32 / 2.0;
+                let y = h32 / w32 * x;
                 let img_y = map_range(y, b, t, 0.0, h32 - 1.0) as u32;
                 let c = mk_srgb(model.image.get_pixel(img_x, img_y));
                 draw.line().color(c).points(pt2(x, -y), pt2(w32, -y));
             }
-            Style::NegYleft => {
+        }
+        Style::NegYleft => {
+            for img_x in 0..width {
+                let x = img_x as f32 - w32 / 2.0;
+                let y = h32 / w32 * x;
                 let img_y = map_range(y, b, t, 0.0, h32 - 1.0) as u32;
                 let c = mk_srgb(model.image.get_pixel(img_x, img_y));
                 draw.line().color(c).points(pt2(x, -y), pt2(-w32, -y));
             }
-            Style::PosY => {
+        }
+        Style::PosY => {
+            for img_x in 0..width {
+                let x = img_x as f32 - w32 / 2.0;
+                let y = h32 / w32 * x;
                 let img_y = map_range(-y, b, t, 0.0, h32 - 1.0) as u32;
                 let c = mk_srgb(model.image.get_pixel(img_x, img_y));
                 draw.line().color(c).points(pt2(x, y), pt2(x, -h32 / 2.0));
             }
-            Style::PosYup => {
+        }
+        Style::PosYup => {
+            for img_x in 0..width {
+                let x = img_x as f32 - w32 / 2.0;
+                let y = h32 / w32 * x;
                 let img_y = map_range(-y, b, t, 0.0, h32 - 1.0) as u32;
                 let c = mk_srgb(model.image.get_pixel(img_x, img_y));
                 draw.line().color(c).points(pt2(x, y), pt2(x, h32 / 2.0));
             }
-            Style::PosYright => {
+        }
+        Style::PosYright => {
+            for img_x in 0..width {
+                let x = img_x as f32 - w32 / 2.0;
+                let y = h32 / w32 * x;
                 let img_y = map_range(-y, b, t, 0.0, h32 - 1.0) as u32;
                 let c = mk_srgb(model.image.get_pixel(img_x, img_y));
                 draw.line().color(c).points(pt2(x, y), pt2(w32, y));
             }
-            Style::PosYleft => {
+        }
+        Style::PosYleft => {
+            for img_x in 0..width {
+                let x = img_x as f32 - w32 / 2.0;
+                let y = h32 / w32 * x;
                 let img_y = map_range(-y, b, t, 0.0, h32 - 1.0) as u32;
                 let c = mk_srgb(model.image.get_pixel(img_x, img_y));
                 draw.line().color(c).points(pt2(x, y), pt2(-w32, y));
             }
-            Style::Line => {
+        }
+        Style::Line => {
+            for img_x in 0..width {
+                let x = img_x as f32 - w32 / 2.0;
+                let y = h32 / w32 * x;
                 let img_y = map_range(y, b, t, 0.0, h32 - 1.0) as u32;
                 let c = mk_srgb(model.image.get_pixel(img_x, img_y));
                 draw.line()
                     .color(c)
                     .points(pt2(x, -h32 / 2.0), pt2(x, h32 / 2.0));
             }
-            Style::Miter => {
+        }
+        Style::Miter => {
+            for img_x in 0..width {
+                let x = img_x as f32 - w32 / 2.0;
+                let y = h32 / w32 * x;
                 let img_y = map_range(y, b, t, 0.0, h32 - 1.0) as u32;
                 let c = mk_srgb(model.image.get_pixel(img_x, img_y));
-                draw.line()
-                    .color(c)
-                    .points(pt2(x, -y), pt2(x, -h32 / 2.0));
-                draw.line()
-                    .color(c)
-                    .points(pt2(x, -y), pt2(w32, -y));
+                draw.line().color(c).points(pt2(x, -y), pt2(x, -h32 / 2.0));
+                draw.line().color(c).points(pt2(x, -y), pt2(w32, -y));
             }
-            Style::CircleIn => {
-                let diameter = height / 3 * 2;
-                let r = diameter as f32 / 2.0;
-                let n = (diameter as f32 * PI) as u32;
-                for t in 0..n / 2 {
-                    let theta = 2.0 * t as f32 / n as f32 * TAU;
-                    let p = pt2(r * theta.cos(), r * theta.sin());
-                    let img_x = (r * theta.cos()) as u32 + width / 2;
-                    let img_y = (-r * theta.sin()) as u32 + height / 2;
-                    let c = mk_srgb(model.image.get_pixel(img_x, img_y));
-                    draw.line().color(c).weight(2.0).points(pt2(0.0, 0.0), p);
-                }
+        }
+        Style::CircleIn => {
+            let diameter = height / 3 * 2;
+            let r = diameter as f32 / 2.0;
+            let n = (diameter as f32 * PI) as u32;
+            for t in 0..n {
+                let theta = t as f32 / n as f32 * TAU;
+                let p = pt2(r * theta.cos(), r * theta.sin());
+                let img_x = (r * theta.cos()) as u32 + width / 2;
+                let img_y = (-r * theta.sin()) as u32 + height / 2;
+                let c = mk_srgb(model.image.get_pixel(img_x, img_y));
+                draw.line().color(c).weight(2.0).points(pt2(0.0, 0.0), p);
             }
-            Style::CircleOut => {
-                let diameter = height / 3 * 2;
-                let r = diameter as f32 / 2.0;
-                let n = (diameter as f32 * PI) as u32;
-                for t in 0..n / 2 {
-                    let theta = 2.0 * t as f32 / n as f32 * TAU;
-                    let p = pt2(r * theta.cos(), r * theta.sin());
-                    let q = pt2(3.0 * r * theta.cos(), 3.0 *  r * theta.sin());
-                    let img_x = (r * theta.cos()) as u32 + width / 2;
-                    let img_y = (-r * theta.sin()) as u32 + height / 2;
-                    let c = mk_srgb(model.image.get_pixel(img_x, img_y));
-                    draw.line().color(c).weight(4.0).points(p, q);
-                }
+        }
+        Style::CircleOut => {
+            let diameter = 2 * height / 3;
+            let r = diameter as f32 / 2.0;
+            let n = (diameter as f32 * PI) as u32;
+            for t in 0..n {
+                let theta = t as f32 / n as f32 * TAU;
+                let p = pt2(r * theta.cos(), r * theta.sin());
+                let q = pt2(9.0 * r * theta.cos(), 9.0 * r * theta.sin());
+                let img_x = (r * theta.cos()) as u32 + width / 2;
+                let img_y = (-r * theta.sin()) as u32 + height / 2;
+                let c = mk_srgb(model.image.get_pixel(img_x, img_y));
+                draw.line().color(c).weight(2.0).points(p, q);
             }
         }
     }
+
     draw.to_frame(app, &frame).unwrap();
 }
 
